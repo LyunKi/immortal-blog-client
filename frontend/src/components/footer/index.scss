@@ -1,0 +1,76 @@
+@import "../../assets/styles/variable";
+@import "../../assets/styles/mixin";
+
+.immortal-footer {
+  position: relative;
+  padding-bottom: 50px;
+  background: $white-color;
+  display: flex;
+  align-items: center;
+  flex-flow: column;
+  .footer-social {
+    width: 1040px;
+    max-width: 100%;
+    margin: 0 auto;
+    .social-list {
+      @include clear-ul-style;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      li {
+        padding: 0 25px;
+        a {
+          @include restore-a-style;
+        }
+      }
+      padding: 20px;
+    }
+    @include text-underline;
+  }
+  .footer-meta {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 960px;
+    max-width: 100%;
+    height: 250px;
+    margin: 20px auto;
+    .meta-item {
+      padding: 0 30px;
+      width: 33%;
+      box-sizing: border-box;
+      font-size: $font-meta-size;
+      color: $font-meta-color;
+      p{
+        padding: 0;
+        margin: 5px 0;
+      }
+      .meta-title{
+        height: 32px;
+        margin-bottom: 12px;
+        font-size: $font-default-size;
+        color: $font-default-color;
+        align-items: center;
+        display: inline-flex;
+      }
+    }
+    .meta-copyright{
+      img{
+        height: 32px;
+        margin-bottom: 12px;
+      }
+    }
+    .meta-contents{
+      @include clear-ul-style;
+      li{
+        height: 25px;
+        a {
+          display: inline-block;
+          vertical-align: center;
+          @include restore-a-style;
+          @include single-row-ellipse;
+        }
+      }
+    }
+  }
+}

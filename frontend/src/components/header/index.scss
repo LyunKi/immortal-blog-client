@@ -1,0 +1,40 @@
+@import "../../assets/styles/mixin";
+@import "../../assets/styles/variable";
+
+.immortal-header {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  text-align: center;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  background: $white-color;
+  .content {
+    position: relative;
+    width: 1040px;
+    max-width: 100%;
+    height: 70px;
+    margin: 0 auto;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    img{
+      width: auto;
+      height: 22px;
+      outline: 0;
+    }
+    .navbar-menu{
+      display: inline-flex;
+      align-items: center;
+      .menu-item {
+        font-size: 14px;
+        padding: 0 15px;
+        @include restore-a-style;
+      }
+      .search{
+        position: relative;
+        right: 0;
+      }
+    }
+  }
+}
