@@ -1,0 +1,37 @@
+@import 'variable';
+
+@mixin clear-ul-style {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+@mixin restore-a-style {
+    text-decoration: none;
+    color: $font-default-color;
+    &:hover {
+        color: #eb5055;
+        outline: 0;
+        cursor: pointer;
+    }
+}
+
+@mixin text-underline {
+    position: relative;
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        height: 1px;
+        transform: translateY(0.5);
+        width: 100%;
+        background: $underline-color;
+    }
+}
+
+@mixin single-row-ellipse {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
