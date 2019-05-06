@@ -68,11 +68,13 @@ const Login = Form.create()(
                         )}
                     </Form.Item>
                     <Form.Item>
-                        {getFieldDecorator('remember', {
-                            valuePropName: 'checked',
-                            initialValue: true,
-                        })(<Checkbox>Remember me</Checkbox>)}
-                        <Link to={'/index'}>Forgot password</Link>
+                        <div className={'login-remember-forgot'}>
+                            {getFieldDecorator('remember', {
+                                valuePropName: 'checked',
+                                initialValue: true,
+                            })(<Checkbox>Remember me</Checkbox>)}
+                            <Link to={'/index'}>Forgot password</Link>
+                        </div>
                         <Button
                             loading={common.loading}
                             type='primary'
@@ -82,7 +84,18 @@ const Login = Form.create()(
                         >
                             Log in
                         </Button>
-                        Or <Link to={'/index'}>register now</Link>
+                        <div className={'sign-about'}>
+                            <div className={'third-party'}>
+                                Sign in with
+                                <Icon
+                                    className={'third-party-icon'}
+                                    type='github'
+                                />
+                            </div>
+                            <Link className={'sign-up'} to={'/index'}>
+                                Sign up
+                            </Link>
+                        </div>
                     </Form.Item>
                 </Form>
             </div>

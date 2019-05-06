@@ -8,7 +8,7 @@
 
 @mixin restore-a-style {
     text-decoration: none;
-    color: $font-default-color;
+    color: $text-color;
     &:hover {
         color: #eb5055;
         outline: 0;
@@ -25,7 +25,7 @@
         height: 1px;
         transform: translateY(0.5);
         width: 100%;
-        background: $underline-color;
+        background: $disabled-color;
     }
 }
 
