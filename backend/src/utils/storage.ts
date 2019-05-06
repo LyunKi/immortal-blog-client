@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { toNumber } from 'lodash/fp';
+import { toNumber } from 'lodash';
 
 class Storage {
     static saveItem<T>(

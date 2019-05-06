@@ -1,13 +1,13 @@
 import React, { useCallback, useContext } from 'react';
-import './index.scss';
 import { Button, Checkbox, Form, Icon, Input } from 'antd';
 import { observer } from 'mobx-react-lite';
 import { FormProps } from 'antd/lib/form';
 import { Link } from 'react-router-dom';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import Context from '@context';
+import './index.scss';
 
-const Login = Form.create({})(
+const Login = Form.create()(
     // @ts-ignore
     observer(({ form }: { form: WrappedFormUtils }) => {
         const { getFieldDecorator, validateFields } = form;
@@ -37,7 +37,7 @@ const Login = Form.create({})(
                             rules: [
                                 {
                                     required: true,
-                                    message: 'Please input your Nickname!',
+                                    message: 'Please input your nickname!',
                                 },
                             ],
                         })(
@@ -54,7 +54,7 @@ const Login = Form.create({})(
                             rules: [
                                 {
                                     required: true,
-                                    message: 'Please input your Password!',
+                                    message: 'Please input your password!',
                                 },
                             ],
                         })(

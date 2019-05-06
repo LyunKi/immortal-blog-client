@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { each } from 'lodash/fp';
+import { each } from 'lodash';
 import { AnyMap } from '@interfaces';
 
 /**
@@ -19,9 +19,9 @@ export const generateUrlParams = (url: string, params: AnyMap) => {
             return `${pre}=${params[key]}`;
         });
     const data = produce(params, draft => {
-        each((ignoreKey: string) => {
+        each(pathKey, (ignoreKey: string) => {
             delete draft[ignoreKey];
-        })(pathKey);
+        });
     });
     return { url: newUrl, data };
 };

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { API_SERVER, Immortal, METHOD } from '@configs';
 import { AnyMap, ApiRequestOptions, IApi, IResponse } from '@interfaces';
-import { each } from 'lodash/fp';
+import { each } from 'lodash';
 import {
     generateAuthorizationHeader,
     generateUrlParams,
@@ -73,8 +73,9 @@ function produceMethod<T>(method: string) {
     };
 }
 
-each((method: string) => {
+each(Reflect.ownKeys(METHOD), method => {
+    // @ts-ignore
     api[method] = produceMethod(method);
-})(Reflect.ownKeys(METHOD));
+});
 
 export { api, instance };
