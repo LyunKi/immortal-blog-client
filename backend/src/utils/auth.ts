@@ -1,5 +1,4 @@
-import { generateAuthorizationHeader } from '@utils/generate';
-import { instance } from '@utils/api';
+import { generateAuthorizationHeader, instance } from '@utils';
 
 class Auth {
     static setToken(token: string) {

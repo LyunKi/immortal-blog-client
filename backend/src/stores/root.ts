@@ -1,5 +1,5 @@
 import { CommonStore, UserStore, FormStore } from '@stores';
-import { AnyMap } from '@interfaces';
+import { AnyObject } from '@interfaces';
 
 export type FormsStore = {
     [key: string]: FormStore;
@@ -15,8 +15,9 @@ export class RootStore {
         this.common = new CommonStore(this);
     }
 
-    newForm(key: string, fields: AnyMap) {
-        this.forms[key] = new FormStore(this, fields);
+    newForm(key: string, initFields: () => Promise<AnyObject>) {
+        this.forms[key] = new FormStore(this);
+        return this.forms[key].init(initFields);
     }
 }
 

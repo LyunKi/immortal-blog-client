@@ -1,21 +1,51 @@
 import { RootStore } from '@stores';
 import { action, observable } from 'mobx';
-import { AnyMap } from '@interfaces';
-import { forEach } from 'lodash';
+import { AnyObject } from '@interfaces';
+import { each } from 'lodash';
 
 export class FormStore {
     private rootStore: RootStore;
 
-    @observable fields: AnyMap;
+    @observable fields: AnyObject = {};
+    @observable initiated: boolean = false;
 
-    @action onFieldsChange(fields: AnyMap) {
-        forEach(fields, (value, key) => {
-            this.fields[key] = value;
+    @observable loading = false;
+
+    @action showLoading = () => {
+        this.loading = true;
+    };
+
+    @action hideLoading = () => {
+        this.loading = false;
+    };
+
+    @action onFieldsChange(fields: AnyObject) {
+        each(fields, (field, key) => {
+            this.fields[key] = field;
         });
     }
 
-    constructor(rootStore: RootStore, fields: AnyMap) {
+    @action onValuesChange(values: AnyObject) {
+        each(values, (value, key) => {
+            this.fields[key] = {
+                ...this.fields[key],
+                value,
+            };
+        });
+    }
+
+    @action init(initFields: () => Promise<AnyObject>) {
+        return initFields().then(fields => {
+            each(fields, (field, key) => {
+                this.fields[key] = {
+                    value: field,
+                };
+            });
+            this.initiated = true;
+        });
+    }
+
+    constructor(rootStore: RootStore) {
         this.rootStore = rootStore;
-        this.fields = fields;
     }
 }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { API_SERVER, Immortal, METHOD } from '@configs';
-import { AnyMap, ApiRequestOptions, IApi, IResponse } from '@interfaces';
+import { AnyObject, ApiRequestOptions, IApi, IResponse } from '@interfaces';
 import { each } from 'lodash';
 import {
     generateAuthorizationHeader,
@@ -60,7 +60,7 @@ const api: IApi = {
 function produceMethod<T>(method: string) {
     return function(
         beforeUrl: string,
-        beforeParams: AnyMap,
+        beforeParams: AnyObject,
         configs: ApiRequestOptions,
     ) {
         const { url, data } = generateUrlParams(beforeUrl, beforeParams);

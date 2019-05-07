@@ -1,13 +1,13 @@
 import produce from 'immer';
 import { each } from 'lodash';
-import { AnyMap } from '@interfaces';
+import { AnyObject } from '@interfaces';
 
 /**
  * a easy function for parsing url by params
  * @param  url
  * @param params
  */
-export const generateUrlParams = (url: string, params: AnyMap) => {
+export const generateUrlParams = (url: string, params: AnyObject) => {
     const pathKey: string[] = [];
     const newUrl = url
         .replace(/:(\w*)/g, (_, key) => {

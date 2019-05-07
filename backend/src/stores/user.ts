@@ -13,7 +13,7 @@ export class UserStore {
     @observable privileges: string[] = [];
 
     @action login(params: ILoginParams) {
-        this.rootStore.common.showLoading();
+        this.rootStore.forms.loginForm.showLoading();
         AuthApi.login(params)
             .then(({ token }) => {
                 //store the token and refresh token
@@ -36,9 +36,9 @@ export class UserStore {
                 });
             })
             .catch(error => {
-                message.error(`Login fail,caused by:${error.message}`);
+                message.error(`Login fail,caused by: ${error.message}`);
             })
-            .finally(this.rootStore.common.hideLoading);
+            .finally(this.rootStore.forms.loginForm.hideLoading);
     }
 
     constructor(rootStore: RootStore) {
