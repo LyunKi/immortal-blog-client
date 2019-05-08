@@ -2,13 +2,11 @@ const { override, fixBabelImports, addWebpackAlias } = require('customize-cra');
 const path = require('path');
 
 module.exports = override(
-    fixBabelImports('import', {
-        libraryName: 'antd',
+    fixBabelImports('antd', {
         libraryDirectory: 'es',
         style: 'css',
     }),
-    fixBabelImports('import', {
-        libraryName: 'lodash',
+    fixBabelImports('lodash', {
         libraryDirectory: '',
         camel2DashComponentName: false, // default: true
     }),
