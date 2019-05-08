@@ -7,9 +7,10 @@ module.exports = override(
         libraryDirectory: 'es',
         style: 'css',
     }),
-    fixBabelImports("lodash", {
-        libraryDirectory: "",
-        camel2DashComponentName: false
+    fixBabelImports('import', {
+        libraryName: 'lodash',
+        libraryDirectory: '',
+        camel2DashComponentName: false, // default: true
     }),
     addWebpackAlias({
         '@pages': path.resolve('src/pages'),

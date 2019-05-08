@@ -15,7 +15,15 @@ export class RootStore {
         this.common = new CommonStore(this);
     }
 
-    newForm(key: string, initFields: () => Promise<AnyObject>) {
+    async createFormStore(
+        key: string,
+        initFields: () => Promise<AnyObject>,
+        refresh: boolean = false,
+    ) {
+        if (this.forms.hasOwnProperty(key)) {
+            //form had been created
+            return refresh && this.forms[key].init(initFields);
+        }
         this.forms[key] = new FormStore(this);
         return this.forms[key].init(initFields);
     }

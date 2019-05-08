@@ -1,7 +1,7 @@
+import { each } from 'lodash';
 import { Form as AntForm, Icon } from 'antd';
 import { AnyObject } from '@interfaces';
 import { store } from '@stores';
-import { each } from 'lodash';
 import React, { ComponentType, PureComponent, Suspense } from 'react';
 
 //Provide a easier way to create a form
@@ -10,7 +10,8 @@ async function createForm<T extends ComponentType<any>>(
     formKey: string,
     initFields: () => Promise<AnyObject>,
 ) {
-    await store.newForm(formKey, initFields);
+    await store.createFormStore(formKey, initFields);
+    await new Promise(resolve => setTimeout(resolve, 10000));
     const formStore = store.forms[formKey];
     return {
         default: AntForm.create({

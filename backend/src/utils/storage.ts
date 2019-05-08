@@ -5,7 +5,7 @@ class Storage {
     static saveItem<T>(
         key: string,
         value: T,
-        expire = 1000 * 60 * 60 * 24 * 15,
+        expire = 1000 * 60 * 60 * 24 * 30,
     ) {
         //default save a month
         let expiredTime = moment.now() + expire;
