@@ -1,9 +1,9 @@
 import { api } from '@utils';
-import { ILoginParams, IPrivileges, IToken } from '@interfaces';
+import { ILoginRequest, ILoginResponse, IPrivileges } from '@interfaces';
 
 export class AuthApi {
-    static login(params: ILoginParams): Promise<IToken> {
-        return api.post<IToken>('/login', params);
+    static login(params: ILoginRequest): Promise<ILoginResponse> {
+        return api.post<ILoginResponse>('/login', params);
     }
     static getPrivileges(): Promise<IPrivileges> {
         return api.get<IPrivileges>('/privileges');

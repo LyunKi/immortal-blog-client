@@ -31,4 +31,8 @@ export class RootStore {
 
 const store = new RootStore();
 
-export { store };
+const getStore = () => {
+    return store;
+};
+
+export { store, getStore };

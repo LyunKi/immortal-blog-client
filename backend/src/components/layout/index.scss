@@ -1,0 +1,37 @@
+@import '../../assets/styles/mixin';
+
+.immortal-layout {
+    .sider {
+        min-height: 100vh;
+        overflow: auto;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        .ant-layout-sider-children {
+            overflow-y: auto;
+        }
+        .logo {
+            height: 4 * $unit-base;
+            background: $image-background;
+            margin: 2 * $unit-base;
+        }
+    }
+    .main {
+        margin-left: 200px;
+        .header {
+            background: $app-background;
+        }
+        .content {
+            margin: 3 * $unit-base 2 * $unit-base 0;
+            .content-container {
+                min-height: 300px;
+                padding: 3 * $unit-base;
+                background: $app-background;
+            }
+        }
+        .footer {
+            text-align: center;
+        }
+    }
+}

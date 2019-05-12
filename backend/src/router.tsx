@@ -1,13 +1,14 @@
-import { Redirect, Route, RouteProps, Switch } from 'react-router';
-import React, { useContext } from 'react';
+import { Redirect, Route, RouteProps, Router, Switch } from 'react-router';
+import React from 'react';
 import { observer } from 'mobx-react-lite';
-import Context from '@context';
 import { Index, Login } from '@pages';
-import { BrowserRouter } from 'react-router-dom';
+import { history } from '@utils';
+import ImmortalLayout from '@components/layout';
+import { useStore } from '@hooks';
 
 export const AuthRoute = observer((props: RouteProps) => {
     const { component: Component, ...rest } = props;
-    const { user } = useContext(Context);
+    const { user } = useStore(['user']);
     return (
         <Route
             {...rest}
@@ -23,28 +24,28 @@ export const AuthRoute = observer((props: RouteProps) => {
     );
 });
 
-export const LoginRoute = observer((props: RouteProps) => {
-    const { user } = useContext(Context);
-    return (
-        <Route
-            {...props}
-            render={props =>
-                user.hasAuthorized ? <Redirect to={'/index'} /> : <Login />
-            }
-        />
-    );
-});
-
 const ImmortalRouter = () => (
-    <BrowserRouter>
+    <Router history={history}>
         <>
             <Switch>
-                <LoginRoute exact path='/login' />
-                <Route exact path='/index' component={Index} />
-                <AuthRoute exact path='/' component={Index} />
+                <Route exact path='/login' component={Login} />
+                <Route
+                    render={() => (
+                        <ImmortalLayout>
+                            <>
+                                <AuthRoute exact path='/' component={Index} />
+                                <AuthRoute
+                                    exact
+                                    path='/index'
+                                    component={Index}
+                                />
+                            </>
+                        </ImmortalLayout>
+                    )}
+                />
             </Switch>
         </>
-    </BrowserRouter>
+    </Router>
 );
 
 export default ImmortalRouter;

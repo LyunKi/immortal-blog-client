@@ -22,5 +22,6 @@ module.exports = override(
         '@apis': path.resolve('src/apis'),
         '@router': path.resolve('src/router'),
         '@context': path.resolve('src/context'),
+        '@hooks': path.resolve('src/hooks'),
     }),
 );

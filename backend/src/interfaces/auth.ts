@@ -1,12 +1,16 @@
-export interface ILoginParams {
+import { AnyObject } from '@interfaces/index';
+
+export interface ILoginRequest {
     remember: boolean;
     nickname: string;
     password: string;
 }
 
-export interface IToken {
+export interface ILoginResponse {
     token: string;
+    privileges: IPrivileges;
 }
 export interface IPrivileges {
-    privileges: string[];
+    roles: String[];
+    permissions: AnyObject;
 }

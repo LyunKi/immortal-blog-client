@@ -1,12 +1,12 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback } from 'react';
 import { Button, Checkbox, Form, Icon, Input } from 'antd';
 import { observer } from 'mobx-react-lite';
 import { Link } from 'react-router-dom';
 import { FormProps } from 'antd/lib/form';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
-import Context from '@context';
 import './index.scss';
 import { createSuspenseForm } from '@utils';
+import { useStore } from '@hooks';
 
 const initLoginFormFields = async () => ({
     nickname: '',
@@ -19,7 +19,8 @@ const LoginForm = createSuspenseForm(
         const {
             forms: { loginForm },
             user,
-        } = useContext(Context);
+        } = useStore(['forms', 'user']);
+
         const login = useCallback(
             event => {
                 event.preventDefault();

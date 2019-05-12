@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { API_SERVER, Immortal, METHOD } from '@configs';
 import { AnyObject, ApiRequestOptions, IApi, IResponse } from '@interfaces';
-import { each } from 'lodash';
+import { each, set } from 'lodash';
 import {
     generateAuthorizationHeader,
     generateUrlParams,
@@ -18,9 +18,11 @@ const instance = axios.create({
 const token = Storage.getItem<string>('token');
 
 if (token) {
-    instance.defaults.headers.common[
-        'Authorization'
-    ] = generateAuthorizationHeader(token);
+    set(
+        instance,
+        'defaults.headers.common.Authorization',
+        generateAuthorizationHeader(token),
+    );
 }
 
 // @ts-ignore
