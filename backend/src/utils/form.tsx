@@ -33,13 +33,13 @@ async function createForm<T extends ComponentType<any>>(
     };
 }
 
-export function createSuspenseForm<T extends ComponentType<any>>(
+export function createLazyForm<T extends ComponentType<any>>(
     Form: T,
     formKey: string,
     initFields: () => Promise<AnyObject>,
 ) {
     const LazyForm = React.lazy(() => createForm(Form, formKey, initFields));
-    return class SuspenseForm extends PureComponent {
+    return class SuspenseForm extends PureComponent<any> {
         render() {
             return (
                 <Suspense fallback={<Icon type={'loading'} />}>

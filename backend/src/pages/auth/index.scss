@@ -1,0 +1,19 @@
+@import '../../assets/styles/mixin';
+.auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    &::after {
+        content: '';
+        background: url('../../assets/img/background.jpg') no-repeat;
+        background-size: 100% 100%;
+        opacity: 0.5;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        position: absolute;
+        z-index: -1;
+    }
+}

@@ -4,6 +4,7 @@ import './index.scss';
 import { useStore } from '@hooks';
 import { observer } from 'mobx-react-lite';
 import { Link } from 'react-router-dom';
+import classnames from 'classnames';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -16,11 +17,11 @@ const ImmortalLayout = observer(({ children }: IProps) => {
     const { common } = useStore(['common']);
     const onCollapse = useCallback(
         collapsed => {
-            console.warn(collapsed);
             common.onCollapse(collapsed);
         },
         [common],
     );
+    const mainLayout = classnames('main', common.marginMenu);
     return (
         <Layout className={'immortal-layout'}>
             <Sider
@@ -59,7 +60,7 @@ const ImmortalLayout = observer(({ children }: IProps) => {
                     </SubMenu>
                 </Menu>
             </Sider>
-            <Layout className={'main'}>
+            <Layout className={mainLayout}>
                 <Header className={'header'} />
                 <Content className={'content'}>
                     <div className={'content-container'}>{children}</div>

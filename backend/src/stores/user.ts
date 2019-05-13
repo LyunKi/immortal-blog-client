@@ -2,7 +2,7 @@ import { RootStore } from '@stores';
 import { action, observable, runInAction } from 'mobx';
 import { message } from 'antd';
 import { Auth, Storage, Navigator } from '@utils';
-import { ILoginRequest, IPrivileges } from '@interfaces/auth';
+import { ILoginRequest, IPrivileges, IRegisterRequest } from '@interfaces/auth';
 import { AuthApi } from '@apis';
 import { AnyObject } from '@interfaces';
 
@@ -39,6 +39,12 @@ export class UserStore {
                 message.error(`Login fail,caused by: ${error.message}`);
             })
             .finally(this.rootStore.forms.loginForm.hideLoading);
+    }
+
+    @action register(params: IRegisterRequest) {
+        this.rootStore.forms.registerForm.showLoading();
+        message.success('Register success');
+        this.rootStore.forms.registerForm.hideLoading();
     }
 
     @action

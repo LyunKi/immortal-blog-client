@@ -35,4 +35,5 @@ const getStore = () => {
     return store;
 };
 
+// @ts-ignore
 export { store, getStore };

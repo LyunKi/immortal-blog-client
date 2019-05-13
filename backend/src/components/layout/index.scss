@@ -17,8 +17,14 @@
             margin: 2 * $unit-base;
         }
     }
-    .main {
+
+    .margin-menu {
         margin-left: 200px;
+    }
+    .margin-collapsed-menu {
+        margin-left: 80px;
+    }
+    .main {
         .header {
             background: $app-background;
         }

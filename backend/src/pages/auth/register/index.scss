@@ -1,0 +1,9 @@
+@import '../../../assets/styles/mixin';
+
+.register-form {
+    width: 280px;
+    .register-form-button {
+        width: 100%;
+        margin: $unit-base 0;
+    }
+}

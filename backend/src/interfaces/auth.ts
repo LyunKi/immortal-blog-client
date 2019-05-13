@@ -14,3 +14,17 @@ export interface IPrivileges {
     roles: String[];
     permissions: AnyObject;
 }
+
+export interface IRegisterRequest {
+    nickname: string;
+    password: string;
+    email: string;
+    sex: number;
+}
+
+export interface IRegisterRequest {
+    nickname: string;
+    password: string;
+    email: string;
+    sex: number;
+}

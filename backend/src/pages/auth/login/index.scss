@@ -1,0 +1,29 @@
+@import '../../../assets/styles/mixin';
+
+.login-form {
+    width: 280px;
+    .login-form-button {
+        width: 100%;
+        margin: $unit-base 0;
+    }
+    .login-remember-forgot,
+    .sign-about {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .third-party {
+        display: inline-flex;
+        align-items: center;
+
+        .third-party-icon {
+            margin-left: $unit-base;
+            font-size: $font-size-huge;
+
+            &:hover {
+                color: $primary-color;
+                cursor: pointer;
+            }
+        }
+    }
+}

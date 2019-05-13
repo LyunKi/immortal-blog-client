@@ -2,37 +2,36 @@ import React, { useCallback } from 'react';
 import { Button, Checkbox, Form, Icon, Input } from 'antd';
 import { observer } from 'mobx-react-lite';
 import { Link } from 'react-router-dom';
-import { FormProps } from 'antd/lib/form';
-import { WrappedFormUtils } from 'antd/lib/form/Form';
 import './index.scss';
-import { createSuspenseForm } from '@utils';
+import { createLazyForm } from '@utils';
 import { useStore } from '@hooks';
+import { FormComponentProps, FormProps } from 'antd/lib/form';
 
 const initLoginFormFields = async () => ({
     nickname: '',
     password: '',
+    remember: true,
 });
 
-const LoginForm = createSuspenseForm(
-    observer(({ form }: { form: WrappedFormUtils }) => {
+const Item = Form.Item;
+
+const LoginForm = createLazyForm(
+    observer(({ form }: FormComponentProps) => {
         const { getFieldDecorator, validateFields } = form;
         const {
             forms: { loginForm },
             user,
         } = useStore(['forms', 'user']);
 
-        const login = useCallback(
-            event => {
-                event.preventDefault();
-                validateFields((err, values) => {
-                    if (err) {
-                        return;
-                    }
-                    user.login(values);
-                });
-            },
-            [validateFields, user],
-        );
+        const login = useCallback(event => {
+            event.preventDefault();
+            validateFields((err, values) => {
+                if (err) {
+                    return;
+                }
+                user.login(values);
+            });
+        }, []);
         const formProps: FormProps = {
             className: 'login-form',
             layout: 'vertical',
@@ -40,12 +39,11 @@ const LoginForm = createSuspenseForm(
         };
         return (
             <Form {...formProps}>
-                <Form.Item>
+                <Item>
                     {getFieldDecorator('nickname', {
                         rules: [
                             {
                                 required: true,
-                                message: 'Please input your nickname!',
                             },
                         ],
                     })(
@@ -56,13 +54,12 @@ const LoginForm = createSuspenseForm(
                             placeholder='Nickname'
                         />,
                     )}
-                </Form.Item>
-                <Form.Item>
+                </Item>
+                <Item>
                     {getFieldDecorator('password', {
                         rules: [
                             {
                                 required: true,
-                                message: 'Please input your password!',
                             },
                         ],
                     })(
@@ -74,12 +71,11 @@ const LoginForm = createSuspenseForm(
                             placeholder='Password'
                         />,
                     )}
-                </Form.Item>
-                <Form.Item>
+                </Item>
+                <Item>
                     <div className={'login-remember-forgot'}>
                         {getFieldDecorator('remember', {
                             valuePropName: 'checked',
-                            initialValue: true,
                         })(<Checkbox>Remember me</Checkbox>)}
                         <Link to={'/index'}>Forgot password</Link>
                     </div>
@@ -88,23 +84,22 @@ const LoginForm = createSuspenseForm(
                         type='primary'
                         htmlType='submit'
                         className='login-form-button'
-                        onClick={login}
                     >
                         Log in
                     </Button>
                     <div className={'sign-about'}>
                         <div className={'third-party'}>
-                            Sign in with
+                            Or sign in with
                             <Icon
-                                className={'third-party-icon'}
+                                className={'third-party-icon grey-icon'}
                                 type='github'
                             />
                         </div>
-                        <Link className={'sign-up'} to={'/index'}>
+                        <Link className={'sign-up'} to={'/auth/register'}>
                             Sign up
                         </Link>
                     </div>
-                </Form.Item>
+                </Item>
             </Form>
         );
     }),
@@ -112,10 +107,4 @@ const LoginForm = createSuspenseForm(
     initLoginFormFields,
 );
 
-const Login = () => (
-    <div className={'login-container'}>
-        <LoginForm />
-    </div>
-);
-
-export default Login;
+export default LoginForm;
