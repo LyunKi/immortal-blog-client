@@ -1,1 +1,1 @@
-export * from './layout';
+export { default as ImmortalLayout } from './layout';

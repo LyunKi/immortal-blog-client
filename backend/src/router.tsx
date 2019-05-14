@@ -3,7 +3,7 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Index, Auth } from '@pages';
 import { history } from '@utils';
-import ImmortalLayout from '@components/layout';
+import { ImmortalLayout } from '@components';
 import { useStore } from '@hooks';
 
 export const AuthRoute = observer((props: RouteProps) => {
@@ -26,25 +26,19 @@ export const AuthRoute = observer((props: RouteProps) => {
 
 const ImmortalRouter = () => (
     <Router history={history}>
-        <>
-            <Switch>
-                <Route exact path='/auth/:actionType' component={Auth} />
-                <Route
-                    render={() => (
-                        <ImmortalLayout>
-                            <Switch>
-                                <AuthRoute
-                                    exact
-                                    path='/index'
-                                    component={Index}
-                                />
-                                <AuthRoute component={Index} />
-                            </Switch>
-                        </ImmortalLayout>
-                    )}
-                />
-            </Switch>
-        </>
+        <Switch>
+            <Route exact path='/auth/:actionType' component={Auth} />
+            <Route
+                render={() => (
+                    <ImmortalLayout>
+                        <Switch>
+                            <AuthRoute exact path='/index' component={Index} />
+                            <AuthRoute component={Index} />
+                        </Switch>
+                    </ImmortalLayout>
+                )}
+            />
+        </Switch>
     </Router>
 );
 
