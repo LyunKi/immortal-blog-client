@@ -2,9 +2,13 @@ import { RootStore } from '@stores';
 import { action, observable, runInAction } from 'mobx';
 import { message } from 'antd';
 import { Auth, Storage, Navigator } from '@utils';
-import { ILoginRequest, IPrivileges, IRegisterRequest } from '@interfaces/auth';
+import {
+    ILoginRequest,
+    IPrivileges,
+    IRegisterRequest,
+    AnyObject,
+} from '@interfaces';
 import { AuthApi } from '@apis';
-import { AnyObject } from '@interfaces';
 
 export class UserStore {
     private rootStore: RootStore;
@@ -43,7 +47,26 @@ export class UserStore {
 
     @action register(params: IRegisterRequest) {
         this.rootStore.forms.registerForm.showLoading();
-        message.success('Register success');
+        AuthApi.register(params).then(() => {
+            //register success,and then redirect to the login page
+            message.success('Register success');
+            this.rootStore
+                .createFormStore(
+                    'loginForm',
+                    async () => {
+                        //auto complete the login form
+                        return {
+                            nickname: params.nickname,
+                            password: params.password,
+                            remember: true,
+                        };
+                    },
+                    true,
+                )
+                .then(() => {
+                    Navigator.goto('/auth/login');
+                });
+        });
         this.rootStore.forms.registerForm.hideLoading();
     }
 

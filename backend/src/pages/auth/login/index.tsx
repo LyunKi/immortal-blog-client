@@ -14,6 +14,7 @@ const initLoginFormFields = async () => ({
 });
 
 const Item = Form.Item;
+const Password = Input.Password;
 
 const LoginForm = createLazyForm(
     observer(({ form }: FormComponentProps) => {
@@ -22,7 +23,6 @@ const LoginForm = createLazyForm(
             forms: { loginForm },
             user,
         } = useStore(['forms', 'user']);
-
         const login = useCallback(event => {
             event.preventDefault();
             validateFields((err, values) => {
@@ -63,11 +63,10 @@ const LoginForm = createLazyForm(
                             },
                         ],
                     })(
-                        <Input
+                        <Password
                             prefix={
                                 <Icon className={'grey-icon'} type='lock' />
                             }
-                            type='password'
                             placeholder='Password'
                         />,
                     )}
