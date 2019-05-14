@@ -32,10 +32,14 @@ const ImmortalRouter = () => (
                 <Route
                     render={() => (
                         <ImmortalLayout>
-                            <>
-                                <Route exact path='/index' component={Index} />
+                            <Switch>
+                                <AuthRoute
+                                    exact
+                                    path='/index'
+                                    component={Index}
+                                />
                                 <AuthRoute component={Index} />
-                            </>
+                            </Switch>
                         </ImmortalLayout>
                     )}
                 />

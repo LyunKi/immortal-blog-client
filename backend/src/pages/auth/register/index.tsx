@@ -17,7 +17,6 @@ const initRegisterFormFields = async () => ({
 
 const Item = Form.Item;
 const Option = Select.Option;
-const Password = Input.Password;
 
 const RegisterForm = createLazyForm(
     observer(({ form }: FormComponentProps) => {
@@ -62,7 +61,7 @@ const RegisterForm = createLazyForm(
                 <Item>
                     {getFieldDecorator('password', {
                         rules: [{ required: true }],
-                    })(<Password placeholder='Password' />)}
+                    })(<Input type='password' placeholder='Password' />)}
                 </Item>
                 <Item>
                     {getFieldDecorator('confirmPassword', {

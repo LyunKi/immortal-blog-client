@@ -52,7 +52,7 @@ const ImmortalLayout = observer(({ children }: IProps) => {
                             <span className='nav-text'>nav 1</span>
                         </Menu.Item>
                         <Menu.Item key='2'>
-                            <Link to={'/login'}>
+                            <Link to={'/auth/login'}>
                                 <Icon type='video-camera' />
                                 <span className='nav-text'>nav 2</span>
                             </Link>
