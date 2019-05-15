@@ -1,6 +1,7 @@
 @import '../../assets/styles/mixin';
 
 .immortal-layout {
+    min-height: 100vh;
     .sider {
         min-height: 100vh;
         overflow: auto;
@@ -31,7 +32,7 @@
         .content {
             margin: 3 * $unit-base 2 * $unit-base 0;
             .content-container {
-                min-height: 300px;
+                min-height: 100%;
                 padding: 3 * $unit-base;
                 background: $app-background;
             }
