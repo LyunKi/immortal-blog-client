@@ -1,13 +1,15 @@
-import { Layout, Menu, Icon } from 'antd';
+import { Layout, Menu, Icon, Avatar } from 'antd';
 import React, { ReactChild, useCallback } from 'react';
 import './index.scss';
 import { useStore } from '@hooks';
 import { observer } from 'mobx-react-lite';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
+import { Logo } from '@components';
+import { generateIcons } from '@utils';
 
 const { Header, Content, Footer, Sider } = Layout;
-const { SubMenu } = Menu;
+const { SubMenu, Item } = Menu;
 
 interface IProps {
     children: ReactChild;
@@ -31,37 +33,53 @@ const ImmortalLayout = observer(({ children }: IProps) => {
                 onCollapse={onCollapse}
                 className={'sider'}
             >
-                <div className='logo' />
+                <Logo
+                    className={classnames('menu-logo', {
+                        'hide-text': common.collapsed,
+                    })}
+                />
                 <Menu
                     theme='dark'
                     mode='inline'
-                    defaultSelectedKeys={['1']}
-                    defaultOpenKeys={['sub1']}
+                    defaultSelectedKeys={['blog-list']}
+                    defaultOpenKeys={['blog']}
                 >
+                    <Item key={'user'}>
+                        <Link to={'/user'}>
+                            <Icon type={'user'} />
+                            <span>User</span>
+                        </Link>
+                    </Item>
                     <SubMenu
-                        key='sub1'
+                        key={'blog'}
                         title={
                             <>
-                                <Icon type='user' />
-                                <span> subnav 1</span>
+                                <Icon component={generateIcons('blog.svg')} />
+                                <span>Blog Admin</span>
                             </>
                         }
                     >
-                        <Menu.Item key='1'>
-                            <Icon type='user' />
-                            <span className='nav-text'>nav 1</span>
-                        </Menu.Item>
-                        <Menu.Item key='2'>
-                            <Link to={'/auth/login'}>
-                                <Icon type='video-camera' />
-                                <span className='nav-text'>nav 2</span>
+                        <Item key={'blog-list'}>
+                            <Link to={'/blog-list'}>
+                                <Icon type='unordered-list' />
+                                <span>Blog List</span>
                             </Link>
-                        </Menu.Item>
+                        </Item>
+                        <Item key={'create-blog'}>
+                            <Link to={'/create-blog'}>
+                                <Icon type='file-add' />
+                                <span>Create Blog</span>
+                            </Link>
+                        </Item>
                     </SubMenu>
                 </Menu>
             </Sider>
             <Layout className={mainLayout}>
-                <Header className={'header'} />
+                <Header className={'header'}>
+                    <div className={'header-right'}>
+                        <Avatar className={'avatar'} icon={'user'} />
+                    </div>
+                </Header>
                 <Content className={'content'}>
                     <div className={'content-container'}>{children}</div>
                 </Content>

@@ -3,10 +3,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-flow: column;
     height: 100%;
+    .login-logo {
+        margin-bottom: 24px;
+    }
     &::after {
         content: '';
-        background: url('../../assets/img/background.jpg') no-repeat;
+        background: url('../../assets/imgs/background.jpg') no-repeat;
         background-size: 100% 100%;
         opacity: 0.5;
         top: 0;

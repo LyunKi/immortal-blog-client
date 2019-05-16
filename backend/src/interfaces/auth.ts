@@ -10,9 +10,16 @@ export interface ILoginResponse {
     token: string;
     privileges: IPrivileges;
 }
+
+export interface IPermissions {
+    [key: string]: number;
+}
+
+export type IRoles = string[];
+
 export interface IPrivileges {
-    roles: String[];
-    permissions: AnyObject;
+    roles: IRoles;
+    permissions: IPermissions;
 }
 
 export interface IRegisterRequest {
@@ -21,3 +28,5 @@ export interface IRegisterRequest {
     email: string;
     sex: number;
 }
+
+export type IAuthStatus = '401' | '403' | '200';

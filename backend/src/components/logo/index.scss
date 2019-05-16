@@ -1,0 +1,18 @@
+@import '../../assets/styles/mixin';
+
+.logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    img {
+        width: 4 * $unit-base;
+        height: 4 * $unit-base;
+    }
+    .logo-text {
+        margin: 0 0 0 2 * $unit-base;
+        font-size: $font-size-huge;
+        font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+        font-weight: 600;
+        color: $heading-color;
+    }
+}

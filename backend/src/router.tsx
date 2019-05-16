@@ -4,22 +4,43 @@ import { observer } from 'mobx-react-lite';
 import { Index, Auth } from '@pages';
 import { history } from '@utils';
 import { ImmortalLayout } from '@components';
-import { useStore } from '@hooks';
+import { useAuthentication } from '@hooks';
+import { IPermissions, IRoles } from '@interfaces';
+import { DEFAULT_FORBIDDEN } from '@configs';
 
-export const AuthRoute = observer((props: RouteProps) => {
-    const { component: Component, ...rest } = props;
-    const { user } = useStore(['user']);
+interface AuthProps extends RouteProps {
+    requirePermissions?: IPermissions;
+    requireRoles?: IRoles;
+    forbiddenRoles?: IRoles;
+}
+
+export const AuthRoute = observer((props: AuthProps) => {
+    const {
+        component: Component,
+        forbiddenRoles = DEFAULT_FORBIDDEN,
+        requirePermissions = {},
+        requireRoles = [],
+        ...rest
+    } = props;
+    const status = useAuthentication(
+        forbiddenRoles,
+        requireRoles,
+        requirePermissions,
+    );
     return (
         <Route
             {...rest}
-            render={props =>
-                user.hasAuthorized ? (
-                    // @ts-ignore
-                    <Component {...props} />
-                ) : (
-                    <Redirect to={'/auth/login'} />
-                )
-            }
+            render={props => {
+                switch (status) {
+                    case '200':
+                        // @ts-ignore
+                        return <Component {...props} />;
+                    case '401':
+                        return <Redirect to={'/auth/login'} />;
+                    case '403':
+                        return <Redirect to={'/exception/403'} />;
+                }
+            }}
         />
     );
 });

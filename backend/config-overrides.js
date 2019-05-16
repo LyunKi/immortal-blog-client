@@ -1,5 +1,6 @@
 const { override, fixBabelImports, addWebpackAlias } = require('customize-cra');
 const path = require('path');
+const rewireSvgReactLoader = require('react-app-rewire-svg-react-loader');
 
 module.exports = override(
     fixBabelImports('antd', {
@@ -24,4 +25,5 @@ module.exports = override(
         '@context': path.resolve('src/context'),
         '@hooks': path.resolve('src/hooks'),
     }),
+    rewireSvgReactLoader,
 );

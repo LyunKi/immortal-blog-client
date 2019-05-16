@@ -2,6 +2,7 @@ import React from 'react';
 import LoginForm from './login';
 import RegisterForm from './register';
 import './index.scss';
+import { Logo } from '@components';
 
 type ActionType = 'login' | 'register';
 
@@ -19,6 +20,7 @@ const Auth = ({
     },
 }: IProps) => (
     <div className={'auth-container'}>
+        <Logo className={'login-logo'} />
         <div className={'form-container'}>
             {actionType === 'login' ? <LoginForm /> : <RegisterForm />}
         </div>

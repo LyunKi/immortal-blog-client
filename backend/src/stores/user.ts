@@ -1,5 +1,5 @@
 import { RootStore } from '@stores';
-import { action, observable, runInAction } from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 import { message } from 'antd';
 import { Auth, Storage, Navigator } from '@utils';
 import {
@@ -13,7 +13,9 @@ import { AuthApi } from '@apis';
 export class UserStore {
     private rootStore: RootStore;
 
-    @observable hasAuthorized = false;
+    @computed get hasAuthorized() {
+        return !!this.privileges;
+    }
     @observable nickname: string = '';
     @observable privileges?: IPrivileges = undefined;
 
@@ -27,7 +29,6 @@ export class UserStore {
                 runInAction(() => {
                     this.privileges = privileges;
                     this.nickname = params.nickname;
-                    this.hasAuthorized = true;
                 });
                 //login success
                 Storage.saveItem('token', token);
@@ -74,7 +75,6 @@ export class UserStore {
     initFromStorage() {
         const userInfo = Storage.getItem<AnyObject>('user');
         if (userInfo !== null) {
-            this.hasAuthorized = userInfo.hasAuthorized;
             this.nickname = userInfo.nickname;
             this.privileges = userInfo.privileges;
         }

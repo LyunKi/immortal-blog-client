@@ -21,4 +21,6 @@ const METHOD = {
     delete: 'delete',
 };
 
-export { API_SERVER, SUCCESS, Immortal, METHOD };
+const DEFAULT_FORBIDDEN = ['untouchable'];
+
+export { API_SERVER, SUCCESS, Immortal, METHOD, DEFAULT_FORBIDDEN };

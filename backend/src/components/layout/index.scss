@@ -12,10 +12,18 @@
         .ant-layout-sider-children {
             overflow-y: auto;
         }
-        .logo {
-            height: 4 * $unit-base;
-            background: $image-background;
-            margin: 2 * $unit-base;
+        .menu-logo {
+            width: 100%;
+            padding: 2 * $unit-base;
+            &.hide-text {
+                .logo-text {
+                    display: none;
+                }
+            }
+            .logo-text {
+                color: $white-color;
+                font-size: $font-size-bigger;
+            }
         }
     }
 
@@ -28,6 +36,13 @@
     .main {
         .header {
             background: $app-background;
+            padding: 0 2 * $unit-base;
+            .header-right {
+                text-align: right;
+            }
+            .avatar {
+                background: $black-color;
+            }
         }
         .content {
             margin: 3 * $unit-base 2 * $unit-base 0;

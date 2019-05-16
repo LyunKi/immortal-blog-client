@@ -49,6 +49,7 @@
     "node-sass": "^4.11.0",
     "path": "^0.12.7",
     "prettier": "^1.17.0",
+    "react-app-rewire-svg-react-loader": "codebandits/react-app-rewire-svg-react-loader",
     "react-app-rewired": "^2.1.1"
   },
   "husky": {

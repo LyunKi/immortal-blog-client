@@ -31,3 +31,12 @@ export const generateUrlParams = (url: string, params: AnyObject) => {
 };
 
 export const generateAuthorizationHeader = (token: string) => 'Bearer ' + token;
+
+export const generateAssets = (relativePath: string) =>
+    require('@assets/' + relativePath);
+
+export const generateImages = (relativePath: string) =>
+    generateAssets('imgs/' + relativePath);
+
+export const generateIcons = (relativePath: string) =>
+    generateAssets('icons/' + relativePath);
