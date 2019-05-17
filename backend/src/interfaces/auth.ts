@@ -7,6 +7,7 @@ export interface ILoginRequest {
 }
 
 export interface ILoginResponse {
+    id: number;
     token: string;
     privileges: IPrivileges;
 }
@@ -29,4 +30,5 @@ export interface IRegisterRequest {
     sex: number;
 }
 
-export type IAuthStatus = '401' | '403' | '200';
+export type IExceptionStatus = '404' | '403';
+export type IAuthStatus = '401' | '403' | '404' | '200';

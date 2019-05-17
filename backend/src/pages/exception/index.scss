@@ -1,0 +1,19 @@
+@import '../../assets/styles/mixin';
+.exception {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    i {
+        font-size: 400px;
+    }
+    .exception-text {
+        h1 {
+            font-size: $font-size-super-huge;
+            margin-bottom: 3 * $unit-base;
+        }
+        p {
+            font-size: $font-size-big;
+            margin-bottom: 2 * $unit-base;
+        }
+    }
+}

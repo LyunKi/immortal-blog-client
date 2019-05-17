@@ -12,6 +12,10 @@ class Navigator {
     static goto(path: string) {
         history.push(path);
     }
+
+    static getLocation() {
+        return history.location;
+    }
 }
 
 export { history, Navigator };

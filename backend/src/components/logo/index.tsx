@@ -9,7 +9,7 @@ interface IProps {
 
 const Logo = ({ className }: IProps) => (
     <span className={classnames('logo', className)}>
-        <img src={generateImages('logo.jpg')} alt={'logo'} />
+        <img src={generateImages('logo')} alt={'logo'} />
         <h1 className={'logo-text'}>Immortal Blog</h1>
     </span>
 );

@@ -2,14 +2,14 @@ import React, { useCallback } from 'react';
 import { generateIcons, Navigator } from '@utils';
 import { Button, Icon } from 'antd';
 
-export const NotFound = () => {
+export const Forbidden = () => {
     const backHome = useCallback(Navigator.goto.bind(null, '/index'), []);
     return (
-        <div className={'not-found exception'}>
-            <Icon component={generateIcons('not-found')} />
+        <div className={'forbidden exception'}>
+            <Icon component={generateIcons('forbidden')} />
             <div className={'exception-text'}>
-                <h1>404</h1>
-                <p>Sorry, the page you visited does not exist</p>
+                <h1>403</h1>
+                <p>Sorry, you don't have access to this page</p>
                 <Button onClick={backHome} type={'primary'}>
                     Back to home
                 </Button>

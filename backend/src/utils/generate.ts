@@ -35,8 +35,8 @@ export const generateAuthorizationHeader = (token: string) => 'Bearer ' + token;
 export const generateAssets = (relativePath: string) =>
     require('@assets/' + relativePath);
 
-export const generateImages = (relativePath: string) =>
-    generateAssets('imgs/' + relativePath);
+export const generateImages = (relativePath: string, suffix = 'jpg') =>
+    generateAssets(`imgs/${relativePath}.${suffix}`);
 
-export const generateIcons = (relativePath: string) =>
-    generateAssets('icons/' + relativePath);
+export const generateIcons = (relativePath: string, suffix = 'svg') =>
+    generateAssets(`icons/${relativePath}.${suffix}`);

@@ -1,4 +1,4 @@
-import { Layout, Menu, Icon, Avatar } from 'antd';
+import { Avatar, Icon, Layout, Menu } from 'antd';
 import React, { ReactChild, useCallback } from 'react';
 import './index.scss';
 import { useStore } from '@hooks';
@@ -7,15 +7,123 @@ import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { Logo } from '@components';
 import { generateIcons } from '@utils';
+import { map } from 'lodash';
+import { AnyObject } from '@interfaces';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu, Item } = Menu;
 
 interface IProps {
     children: ReactChild;
+    location: AnyObject;
 }
 
-const ImmortalLayout = observer(({ children }: IProps) => {
+interface IMenuIcon {
+    type: 'type' | 'component';
+    value: string;
+}
+
+interface IMenu {
+    key: string;
+    link: string;
+    name: string;
+    icon: IMenuIcon;
+}
+
+interface ISubMenu {
+    key: string;
+    name: string;
+    icon: IMenuIcon;
+    children: IMenu[];
+}
+
+type MultiMenu = IMenu | ISubMenu;
+
+function isSubMenu(menu: MultiMenu): menu is ISubMenu {
+    return (menu as ISubMenu).children !== undefined;
+}
+
+const MENUS: MultiMenu[] = [
+    {
+        key: 'user-admin',
+        name: 'User Admin',
+        link: '/users',
+        icon: {
+            type: 'type',
+            value: 'team',
+        },
+    },
+    {
+        key: 'tag-admin',
+        name: 'Tag Admin',
+        link: '/tags',
+        icon: {
+            type: 'type',
+            value: 'tags',
+        },
+    },
+    {
+        key: 'blog-admin',
+        name: 'Blog Admin',
+        icon: {
+            type: 'component',
+            value: 'blog',
+        },
+        children: [
+            {
+                key: 'blogs',
+                name: 'Blogs',
+                link: '/blogs',
+                icon: {
+                    type: 'type',
+                    value: 'unordered-list',
+                },
+            },
+            {
+                key: 'blog-creation',
+                name: 'Blog Creation',
+                link: '/blogs/creation',
+                icon: {
+                    type: 'type',
+                    value: 'file-add',
+                },
+            },
+        ],
+    },
+];
+
+const renderMenu = (menu: IMenu) => (
+    <Item key={menu.key}>
+        <Link to={menu.link}>
+            {menu.icon.type === 'type' ? (
+                <Icon type={menu.icon.value} />
+            ) : (
+                <Icon component={generateIcons(menu.icon.value)} />
+            )}
+            <span>{menu.name}</span>
+        </Link>
+    </Item>
+);
+
+const renderSubMenu = (menu: ISubMenu) => (
+    <SubMenu
+        key={menu.key}
+        title={
+            <>
+                {menu.icon.type === 'type' ? (
+                    <Icon type={menu.icon.value} />
+                ) : (
+                    <Icon component={generateIcons(menu.icon.value)} />
+                )}
+                <span>{menu.name}</span>
+            </>
+        }
+    >
+        {map(menu.children, renderMenu)}
+    </SubMenu>
+);
+
+const ImmortalLayout = observer(({ children, location }: IProps) => {
     const { common } = useStore(['common']);
     const onCollapse = useCallback(
         collapsed => {
@@ -38,40 +146,12 @@ const ImmortalLayout = observer(({ children }: IProps) => {
                         'hide-text': common.collapsed,
                     })}
                 />
-                <Menu
-                    theme='dark'
-                    mode='inline'
-                    defaultSelectedKeys={['blog-list']}
-                    defaultOpenKeys={['blog']}
-                >
-                    <Item key={'user'}>
-                        <Link to={'/user'}>
-                            <Icon type={'user'} />
-                            <span>User</span>
-                        </Link>
-                    </Item>
-                    <SubMenu
-                        key={'blog'}
-                        title={
-                            <>
-                                <Icon component={generateIcons('blog.svg')} />
-                                <span>Blog Admin</span>
-                            </>
-                        }
-                    >
-                        <Item key={'blog-list'}>
-                            <Link to={'/blog-list'}>
-                                <Icon type='unordered-list' />
-                                <span>Blog List</span>
-                            </Link>
-                        </Item>
-                        <Item key={'create-blog'}>
-                            <Link to={'/create-blog'}>
-                                <Icon type='file-add' />
-                                <span>Create Blog</span>
-                            </Link>
-                        </Item>
-                    </SubMenu>
+                <Menu theme='dark' mode='inline'>
+                    {map(MENUS, menu => {
+                        return isSubMenu(menu)
+                            ? renderSubMenu(menu as ISubMenu)
+                            : renderMenu(menu as IMenu);
+                    })}
                 </Menu>
             </Sider>
             <Layout className={mainLayout}>

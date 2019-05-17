@@ -17,22 +17,25 @@ export class UserStore {
         return !!this.privileges;
     }
     @observable nickname: string = '';
+    @observable id?: number;
     @observable privileges?: IPrivileges = undefined;
 
     @action login(params: ILoginRequest) {
         this.rootStore.forms.loginForm.showLoading();
         AuthApi.login(params)
-            .then(({ token, privileges }) => {
+            .then(({ token, privileges, id }) => {
                 //store the token and refresh token
                 Auth.setToken(token);
                 //get privileges of current user
                 runInAction(() => {
                     this.privileges = privileges;
+                    this.id = id;
                     this.nickname = params.nickname;
                 });
                 //login success
                 Storage.saveItem('token', token);
                 Storage.saveItem('user', {
+                    id: this.id,
                     privileges: this.privileges,
                     nickname: this.nickname,
                     hasAuthorized: this.hasAuthorized,
