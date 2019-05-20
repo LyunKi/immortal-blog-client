@@ -7,7 +7,6 @@ export interface ILoginRequest {
 }
 
 export interface ILoginResponse {
-    id: number;
     token: string;
     privileges: IPrivileges;
 }

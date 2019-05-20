@@ -15,20 +15,23 @@ const columns: ColumnProps<any>[] = [
         render: () => <span>color</span>,
     },
     {
+        title: 'created at',
+        dataIndex: 'created_at',
+        sorter: (x, y) => moment(x).valueOf() - moment(y).valueOf(),
+    },
+    {
+        title: 'created by',
+        dataIndex: 'created_by',
+    },
+    {
         title: 'updated at',
         dataIndex: 'updated_at',
         defaultSortOrder: 'descend',
         sorter: (x, y) => moment(x).valueOf() - moment(y).valueOf(),
     },
     {
-        title: 'created at',
-        dataIndex: 'created_at',
-        defaultSortOrder: 'descend',
-        sorter: (x, y) => moment(x).valueOf() - moment(y).valueOf(),
-    },
-    {
-        title: 'created by',
-        dataIndex: 'created_by',
+        title: 'updated by',
+        dataIndex: 'updated_by',
     },
     {
         title: 'action',
