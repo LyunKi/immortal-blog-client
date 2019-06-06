@@ -1,14 +1,24 @@
-import { AnyObject } from '@interfaces';
-
 export interface ILoginRequest {
     remember: boolean;
     nickname: string;
     password: string;
 }
 
+export interface IUserInfo {
+    id: number;
+    nickname: string;
+    email: string;
+    phone: string;
+    avatar: string;
+    sex: number;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface ILoginResponse {
     token: string;
     privileges: IPrivileges;
+    userInfo: IUserInfo;
 }
 
 export interface IPermissions {

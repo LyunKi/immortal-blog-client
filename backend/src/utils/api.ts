@@ -1,33 +1,48 @@
 import axios from 'axios';
 import { API_SERVER, Immortal, METHOD } from '@configs';
-import { AnyObject, ApiRequestOptions, IApi, IResponse } from '@interfaces';
+import { IObject, IApiRequestOptions, IApi, IResponse } from '@interfaces';
 import { each, set } from 'lodash';
 import {
     generateAuthorizationHeader,
     generateUrlParams,
     Storage,
 } from '@utils';
+import humps from 'humps';
 
 const instance = axios.create({
     baseURL: API_SERVER,
     timeout: 10000,
     headers: { 'Content-Type': 'application/json' },
+    transformResponse: [
+        //@ts-ignore
+        ...axios.defaults.transformResponse,
+        data => humps.camelizeKeys(data),
+    ],
+    transformRequest: [
+        data => humps.decamelizeKeys(data),
+        //@ts-ignore
+        ...axios.defaults.transformRequest,
+    ],
 });
 
-//try to get the token from storage , and set into axios instance
-const token = Storage.getItem<string>('token');
-
-if (token) {
+const setTokenHeader = (token: string) => {
     set(
         instance,
         'defaults.headers.common.Authorization',
         generateAuthorizationHeader(token),
     );
+};
+
+//try to get the token from storage , and set into axios instance
+const token = Storage.getItem<string>('token');
+
+if (token) {
+    setTokenHeader(token);
 }
 
 // @ts-ignore
 const api: IApi = {
-    request<T>(options: ApiRequestOptions): Promise<T> {
+    request<T>(options: IApiRequestOptions): Promise<T> {
         return instance(options)
             .catch(error => {
                 if (error.response) {
@@ -62,8 +77,8 @@ const api: IApi = {
 function produceMethod<T>(method: string) {
     return function(
         beforeUrl: string,
-        beforeParams: AnyObject,
-        configs: ApiRequestOptions,
+        beforeParams: IObject,
+        configs: IApiRequestOptions,
     ) {
         const { url, data } = generateUrlParams(beforeUrl, beforeParams);
         return api.request<T>({
@@ -80,4 +95,4 @@ each(Reflect.ownKeys(METHOD), method => {
     api[method] = produceMethod(method);
 });
 
-export { api, instance };
+export { api, instance as apiInstance, setTokenHeader };

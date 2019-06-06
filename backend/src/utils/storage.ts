@@ -29,21 +29,7 @@ class Storage {
         return hasFlag;
     }
 
-    static getItemOrDefault<T>(key: string, defaultValue: T): T {
-        let result = defaultValue;
-        const returnValue = window.localStorage.getItem(key);
-        if (returnValue) {
-            const [dataString, expiredTIme] = returnValue.split(/&expire:/);
-            if (toNumber(expiredTIme) > moment.now()) {
-                result = JSON.parse(dataString).value;
-            } else {
-                window.localStorage.removeItem(key);
-            }
-        }
-        return result;
-    }
-
-    static getItem<T>(key: string): T | null {
+    static getItem<T>(key: string, defaultValue: T | null = null): T | null {
         const returnValue = window.localStorage.getItem(key);
         if (returnValue) {
             const [dataString, expiredTIme] = returnValue.split(/&expire:/);
@@ -52,7 +38,7 @@ class Storage {
             }
             window.localStorage.removeItem(key);
         }
-        return null;
+        return defaultValue;
     }
 }
 export { Storage };

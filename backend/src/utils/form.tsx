@@ -1,6 +1,6 @@
 import { each } from 'lodash';
 import { Form as AntForm, Icon } from 'antd';
-import { AnyObject } from '@interfaces';
+import { IObject } from '@interfaces';
 import { getStore } from '@stores';
 import React, { ComponentType, PureComponent, Suspense } from 'react';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
@@ -9,7 +9,7 @@ import { WrappedFormUtils } from 'antd/lib/form/Form';
 async function createForm<T extends ComponentType<any>>(
     Form: T,
     formKey: string,
-    initFields: () => Promise<AnyObject>,
+    initFields: () => Promise<IObject>,
 ) {
     const store = getStore();
     await store.createFormStore(formKey, initFields);
@@ -17,7 +17,7 @@ async function createForm<T extends ComponentType<any>>(
     const formStore = store.forms[formKey];
     const WrapperForm = AntForm.create({
         mapPropsToFields() {
-            let formFields: AnyObject = {};
+            let formFields: IObject = {};
             each(formStore.fields, (field, key) => {
                 formFields[key] = AntForm.createFormField(field);
             });
@@ -44,7 +44,7 @@ async function createForm<T extends ComponentType<any>>(
 export function createLazyForm<T extends ComponentType<any>>(
     Form: T,
     formKey: string,
-    initFields: () => Promise<AnyObject>,
+    initFields: () => Promise<IObject>,
 ) {
     const LazyForm = React.lazy(() => createForm(Form, formKey, initFields));
     return class SuspenseForm extends PureComponent<any> {

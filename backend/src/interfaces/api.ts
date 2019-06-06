@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
 
-export interface ApiRequestOptions extends AxiosRequestConfig {}
+export interface IApiRequestOptions extends AxiosRequestConfig {}
 
 export interface IResponse<T> {
     code: number;

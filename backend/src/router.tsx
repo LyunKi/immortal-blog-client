@@ -58,15 +58,20 @@ const ImmortalRouter = () => (
                 render={props => (
                     <ImmortalLayout {...props}>
                         <Switch>
-                            <Route exact path='/tags' component={TagAdmin} />
-                            <Route exact path='/index' component={Index} />
-                            <Route
+                            <AuthRoute
                                 exact
+                                path='/tags'
+                                component={TagAdmin}
+                            />
+                            <AuthRoute exact path='/index' component={Index} />
+                            <AuthRoute
+                                exact
+                                forbiddenRoles={[]}
                                 path='/exception/:status'
                                 component={Exception}
                             />
-                            <Route exact path='/' component={Index} />
-                            <Route notFound component={Index} />
+                            <AuthRoute exact path='/' component={Index} />
+                            <AuthRoute notFound component={Index} />
                         </Switch>
                     </ImmortalLayout>
                 )}

@@ -1,6 +1,6 @@
 import { RootStore } from '@stores';
 import { action, observable, runInAction } from 'mobx';
-import { AnyObject } from '@interfaces';
+import { IObject } from '@interfaces';
 import { each } from 'lodash';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 
@@ -9,7 +9,7 @@ export class FormStore {
 
     form?: WrappedFormUtils;
 
-    @observable fields: AnyObject = {};
+    @observable fields: IObject = {};
     @observable initiated: boolean = false;
 
     @observable loading = false;
@@ -22,13 +22,13 @@ export class FormStore {
         this.loading = false;
     };
 
-    @action onFieldsChange(fields: AnyObject) {
+    @action onFieldsChange(fields: IObject) {
         each(fields, (field, key) => {
             this.fields[key] = field;
         });
     }
 
-    @action onValuesChange(values: AnyObject) {
+    @action onValuesChange(values: IObject) {
         each(values, (value, key) => {
             this.fields[key] = {
                 ...this.fields[key],
@@ -37,7 +37,7 @@ export class FormStore {
         });
     }
 
-    @action async init(initFields: () => Promise<AnyObject>) {
+    @action async init(initFields: () => Promise<IObject>) {
         const fields = await initFields();
         runInAction(() => {
             each(fields, (field, key) => {

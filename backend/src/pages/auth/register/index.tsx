@@ -5,14 +5,14 @@ import { FormComponentProps, FormProps } from 'antd/lib/form';
 import { Button, Form, Input, Select } from 'antd';
 import './index.scss';
 import { Link } from 'react-router-dom';
-import { useStore } from '@hooks';
+import { useCheckRepeatedName, useConfirmSamePassword, useStore } from '@hooks';
 
 const initRegisterFormFields = async () => ({
     email: '',
     nickname: '',
     password: '',
     confirmPassword: '',
-    sex: undefined,
+    sex: 2,
 });
 
 const Item = Form.Item;
@@ -25,22 +25,25 @@ const RegisterForm = createLazyForm(
             forms: { registerForm },
             user,
         } = useStore(['forms', 'user']);
-        const register = useCallback(event => {
-            event.preventDefault();
-            validateFields((err, values) => {
-                if (err) {
-                    return;
-                }
-                user.register(values);
-            });
-        }, []);
-        const confirmSamePassword = useCallback((_, value, callback) => {
-            if (value !== getFieldValue('password')) {
-                callback('The two passwords you entered did not match.');
-            } else {
-                callback();
-            }
-        }, []);
+
+        const register = useCallback(
+            event => {
+                event.preventDefault();
+                validateFields((err, values) => {
+                    if (err) {
+                        return;
+                    }
+                    user.register(values);
+                });
+            },
+            [validateFields, user],
+        );
+
+        const confirmSamePassword = useConfirmSamePassword(
+            getFieldValue('password'),
+        );
+        const checkRepeatedName = useCheckRepeatedName();
+
         const formProps: FormProps = {
             className: 'register-form',
             layout: 'vertical',
@@ -48,26 +51,33 @@ const RegisterForm = createLazyForm(
         };
         return (
             <Form {...formProps}>
-                <Item>
+                <Item hasFeedback>
                     {getFieldDecorator('nickname', {
-                        rules: [{ required: true }],
+                        rules: [
+                            { required: true },
+                            {
+                                validator: checkRepeatedName,
+                            },
+                        ],
                     })(<Input placeholder='Nickname' />)}
                 </Item>
-                <Item>
+                <Item hasFeedback>
                     {getFieldDecorator('email', {
                         rules: [{ required: true, type: 'email' }],
                     })(<Input placeholder='Email' />)}
                 </Item>
-                <Item>
+                <Item hasFeedback>
                     {getFieldDecorator('password', {
                         rules: [{ required: true }],
                     })(<Input type='password' placeholder='Password' />)}
                 </Item>
-                <Item>
+                <Item hasFeedback>
                     {getFieldDecorator('confirmPassword', {
                         rules: [
                             {
                                 required: true,
+                            },
+                            {
                                 validator: confirmSamePassword,
                             },
                         ],

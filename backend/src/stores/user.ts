@@ -1,12 +1,13 @@
 import { RootStore } from '@stores';
 import { action, computed, observable, runInAction } from 'mobx';
 import { message } from 'antd';
-import { Auth, Storage, Navigator } from '@utils';
+import { Storage, Navigator, setTokenHeader } from '@utils';
 import {
     ILoginRequest,
     IPrivileges,
     IRegisterRequest,
-    AnyObject,
+    IObject,
+    IUserInfo,
 } from '@interfaces';
 import { AuthApi } from '@apis';
 
@@ -16,27 +17,29 @@ export class UserStore {
     @computed get hasAuthorized() {
         return !!this.privileges;
     }
-    @observable nickname: string = '';
-    @observable id?: number;
+    @computed get hasInitialized() {
+        return !!this.userInfo;
+    }
+    @observable userInfo?: IUserInfo;
     @observable privileges?: IPrivileges = undefined;
 
     @action login(params: ILoginRequest) {
         this.rootStore.forms.loginForm.showLoading();
         AuthApi.login(params)
-            .then(({ token, privileges }) => {
-                //store the token and refresh token
-                Auth.setToken(token);
+            .then(({ token, privileges, userInfo }) => {
+                console.warn(userInfo);
+                //store the token or refresh token
+                setTokenHeader(token);
                 //get privileges of current user
                 runInAction(() => {
                     this.privileges = privileges;
-                    this.nickname = params.nickname;
+                    this.userInfo = userInfo;
                 });
                 //login success
                 Storage.saveItem('token', token);
                 Storage.saveItem('user', {
                     privileges: this.privileges,
-                    nickname: this.nickname,
-                    hasAuthorized: this.hasAuthorized,
+                    userInfo: userInfo,
                 });
                 message.success('Login success');
                 Navigator.goto('/index');
@@ -74,10 +77,10 @@ export class UserStore {
 
     @action
     initFromStorage() {
-        const userInfo = Storage.getItem<AnyObject>('user');
-        if (userInfo !== null) {
-            this.nickname = userInfo.nickname;
-            this.privileges = userInfo.privileges;
+        const user = Storage.getItem<IObject>('user');
+        if (user !== null) {
+            this.userInfo = user.userInfo;
+            this.privileges = user.privileges;
         }
     }
 

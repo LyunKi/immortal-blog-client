@@ -2,6 +2,7 @@ import React from 'react';
 import { IExceptionStatus } from '@interfaces';
 import { Forbidden } from './403';
 import { NotFound } from './404';
+import './index.scss';
 
 interface IProps {
     match: {

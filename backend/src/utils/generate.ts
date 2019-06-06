@@ -1,14 +1,14 @@
 import produce from 'immer';
-import { each, map } from 'lodash';
-import { AnyObject } from '@interfaces';
+import { each, map, isEmpty } from 'lodash';
+import { IObject } from '@interfaces';
 
 /**
  * a easy function for parsing url by params
  * @param  url
  * @param params
- * @example generateUrlParams("/test/:a",{a:3,$query:{b:2}}) => {url:"test/3?b=2" ,data:{}}
+ * @example generateUrlParams("/test/:a",{a:3,$query:{b:2}}) => {url:"test/3?b=2" ,data:undefined}
  */
-export const generateUrlParams = (url: string, params: AnyObject) => {
+export const generateUrlParams = (url: string, params: IObject) => {
     const pathKey: string[] = [];
     let newUrl = url.replace(/:(\w*)/g, (_, key) => {
         pathKey.push(key);
@@ -19,14 +19,18 @@ export const generateUrlParams = (url: string, params: AnyObject) => {
             params.$query,
             (value: string, key: string) => `${key}=${value}`,
         );
-        newUrl += `?${queries}`;
+        if (newUrl.indexOf('?') === -1) {
+            newUrl += '?';
+        }
+        newUrl += `${queries}`;
     }
-    const data = produce(params, draft => {
+    const tempData = produce(params, draft => {
         each(pathKey, (ignoreKey: string) => {
             delete draft[ignoreKey];
-            delete draft['query'];
+            delete draft['$query'];
         });
     });
+    const data = isEmpty(tempData) ? undefined : tempData;
     return { url: newUrl, data };
 };
 

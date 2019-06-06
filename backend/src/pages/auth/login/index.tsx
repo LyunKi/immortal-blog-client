@@ -23,15 +23,18 @@ const LoginForm = createLazyForm(
             forms: { loginForm },
             user,
         } = useStore(['forms', 'user']);
-        const login = useCallback(event => {
-            event.preventDefault();
-            validateFields((err, values) => {
-                if (err) {
-                    return;
-                }
-                user.login(values);
-            });
-        }, []);
+        const login = useCallback(
+            event => {
+                event.preventDefault();
+                validateFields((err, values) => {
+                    if (err) {
+                        return;
+                    }
+                    user.login(values);
+                });
+            },
+            [validateFields, user],
+        );
         const formProps: FormProps = {
             className: 'login-form',
             layout: 'vertical',

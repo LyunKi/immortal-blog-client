@@ -12,7 +12,7 @@ export const useStore = (storeKeys?: StoreKeys): TargetStores | RootStore => {
     if (!storeKeys) {
         return store;
     }
-    let result = <TargetStores>{};
+    let result = {} as TargetStores;
     each(storeKeys, key => {
         result[key] = store[key];
     });

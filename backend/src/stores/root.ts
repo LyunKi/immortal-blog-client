@@ -1,5 +1,5 @@
 import { CommonStore, UserStore, FormStore } from '@stores';
-import { AnyObject } from '@interfaces';
+import { IObject } from '@interfaces';
 
 export type FormsStore = {
     [key: string]: FormStore;
@@ -17,7 +17,7 @@ export class RootStore {
 
     async createFormStore(
         key: string,
-        initFields: () => Promise<AnyObject>,
+        initFields: () => Promise<IObject>,
         refresh: boolean = false,
     ) {
         if (this.forms.hasOwnProperty(key)) {

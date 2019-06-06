@@ -7,15 +7,14 @@ import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { Logo } from '@components';
 import { generateIcons } from '@utils';
-import { map } from 'lodash';
-import { AnyObject } from '@interfaces';
+import { map, get } from 'lodash';
+import { IObject } from '@interfaces';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu, Item } = Menu;
 
 interface IProps {
     children: ReactChild;
-    location: AnyObject;
 }
 
 interface IMenuIcon {
@@ -123,8 +122,17 @@ const renderSubMenu = (menu: ISubMenu) => (
     </SubMenu>
 );
 
-const ImmortalLayout = observer(({ children, location }: IProps) => {
-    const { common } = useStore(['common']);
+const ImmortalLayout = observer(({ children }: IProps) => {
+    const { common, user } = useStore(['common', 'user']);
+    let avatarProps: IObject = {
+        className: 'avatar',
+    };
+    const avatar = get(user, 'userInfo.avatar');
+    if (avatar) {
+        avatarProps.src = avatar;
+    } else {
+        avatarProps.icon = 'user';
+    }
     const onCollapse = useCallback(
         collapsed => {
             common.onCollapse(collapsed);
@@ -157,7 +165,7 @@ const ImmortalLayout = observer(({ children, location }: IProps) => {
             <Layout className={mainLayout}>
                 <Header className={'header'}>
                     <div className={'header-right'}>
-                        <Avatar className={'avatar'} icon={'user'} />
+                        <Avatar {...avatarProps} />
                     </div>
                 </Header>
                 <Content className={'content'}>

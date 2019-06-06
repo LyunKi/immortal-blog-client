@@ -1,6 +1,8 @@
 import { IAuthStatus, IPermissions, IRoles } from '@interfaces';
 import { isEmpty, get, intersection, some } from 'lodash';
-import { useStore } from '@hooks';
+import { useDebounce, useStore } from '@hooks';
+import { useCallback } from 'react';
+import { AuthApi } from '@apis';
 
 export const useCheckStatus = (
     forbiddenRoles: IRoles,
@@ -37,4 +39,31 @@ export const useCheckStatus = (
         return '403';
     }
     return '200';
+};
+
+export const useConfirmSamePassword = (password: string) => {
+    return useCallback(
+        (_, value, callback) => {
+            if (value !== password) {
+                callback('The two passwords you entered did not match.');
+            } else {
+                callback();
+            }
+        },
+        [password],
+    );
+};
+
+export const useCheckRepeatedName = () => {
+    return useDebounce((_, value, callback) => {
+        AuthApi.getUserByConditions({
+            nickname: value,
+        }).then(userInfo => {
+            if (!!userInfo) {
+                callback('This nickname already exists');
+            } else {
+                callback();
+            }
+        });
+    }, []);
 };

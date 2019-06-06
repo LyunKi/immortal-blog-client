@@ -2,8 +2,10 @@ import { api } from '@utils';
 import {
     ILoginRequest,
     ILoginResponse,
+    IObject,
     IPrivileges,
     IRegisterRequest,
+    IUserInfo,
 } from '@interfaces';
 
 export class AuthApi {
@@ -13,7 +15,14 @@ export class AuthApi {
     static register(params: IRegisterRequest) {
         return api.post<null>('/register', params);
     }
-    static getPrivileges(): Promise<IPrivileges> {
+    static getPrivileges() {
         return api.get<IPrivileges>('/privileges');
+    }
+    static getUserByConditions(conditions: IObject) {
+        return api.get<IUserInfo>('/users', {
+            $query: {
+                ...conditions,
+            },
+        });
     }
 }
