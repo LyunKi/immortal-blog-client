@@ -37,6 +37,9 @@
         .header {
             background: $app-background;
             padding: 0 2 * $unit-base;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             .header-right {
                 text-align: right;
             }

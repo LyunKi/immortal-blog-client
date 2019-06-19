@@ -1,4 +1,4 @@
-import { Avatar, Icon, Layout, Menu } from 'antd';
+import { Avatar, Breadcrumb, Icon, Layout, Menu } from 'antd';
 import React, { ReactChild, useCallback } from 'react';
 import './index.scss';
 import { useStore } from '@hooks';
@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { Logo } from '@components';
 import { generateIcons } from '@utils';
-import { map, get } from 'lodash';
+import { get, map, filter } from 'lodash';
 import { IObject } from '@interfaces';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -15,6 +15,7 @@ const { SubMenu, Item } = Menu;
 
 interface IProps {
     children: ReactChild;
+    location: IObject;
 }
 
 interface IMenuIcon {
@@ -122,7 +123,26 @@ const renderSubMenu = (menu: ISubMenu) => (
     </SubMenu>
 );
 
-const ImmortalLayout = observer(({ children }: IProps) => {
+const ImmortalLayout = observer(({ children, location }: IProps) => {
+    const pathSnippets = filter(location.pathname.split('/'), (i: any) => i);
+    const extraBreadcrumbItems = map(
+        pathSnippets,
+        (value: any, index: number) => {
+            const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
+            return (
+                <Breadcrumb.Item key={url}>
+                    <Link to={url}>{value}</Link>
+                </Breadcrumb.Item>
+            );
+        },
+    );
+    const breadcrumbItems = [
+        <Breadcrumb.Item key='home'>
+            <Link to='/'>
+                <Icon type={'home'} />
+            </Link>
+        </Breadcrumb.Item>,
+    ].concat(extraBreadcrumbItems);
     const { common, user } = useStore(['common', 'user']);
     let avatarProps: IObject = {
         className: 'avatar',
@@ -164,6 +184,9 @@ const ImmortalLayout = observer(({ children }: IProps) => {
             </Sider>
             <Layout className={mainLayout}>
                 <Header className={'header'}>
+                    <div className={'header-left'}>
+                        <Breadcrumb>{breadcrumbItems}</Breadcrumb>
+                    </div>
                     <div className={'header-right'}>
                         <Avatar {...avatarProps} />
                     </div>

@@ -7,18 +7,19 @@ import './index.scss';
 import { Link } from 'react-router-dom';
 import { useCheckRepeatedName, useConfirmSamePassword, useStore } from '@hooks';
 
+const FORM_KEY = 'registerForm';
 const initRegisterFormFields = async () => ({
-    email: '',
-    nickname: '',
-    password: '',
-    confirmPassword: '',
+    email: undefined,
+    nickname: undefined,
+    password: undefined,
+    confirmPassword: undefined,
     sex: 2,
 });
 
 const Item = Form.Item;
 const Option = Select.Option;
 
-const RegisterForm = createLazyForm(
+const RegisterForm = createLazyForm(FORM_KEY, initRegisterFormFields)(
     observer(({ form }: FormComponentProps) => {
         const { getFieldDecorator, validateFields, getFieldValue } = form;
         const {
@@ -93,7 +94,7 @@ const RegisterForm = createLazyForm(
                         <Select placeholder='Sex' showSearch>
                             <Option value={0}>male</Option>
                             <Option value={1}>female</Option>
-                            <Option value={2}>unknown</Option>
+                            <Option value={2}>unknown gender</Option>
                         </Select>,
                     )}
                 </Item>
@@ -113,8 +114,6 @@ const RegisterForm = createLazyForm(
             </Form>
         );
     }),
-    'registerForm',
-    initRegisterFormFields,
 );
 
 export default RegisterForm;

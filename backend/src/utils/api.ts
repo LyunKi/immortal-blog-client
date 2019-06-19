@@ -1,13 +1,15 @@
 import axios from 'axios';
 import { API_SERVER, Immortal, METHOD } from '@configs';
-import { IObject, IApiRequestOptions, IApi, IResponse } from '@interfaces';
+import { IApi, IApiRequestOptions, IObject, IResponse } from '@interfaces';
 import { each, set } from 'lodash';
 import {
     generateAuthorizationHeader,
     generateUrlParams,
+    Navigator,
     Storage,
 } from '@utils';
 import humps from 'humps';
+import qs from 'qs';
 
 const instance = axios.create({
     baseURL: API_SERVER,
@@ -23,6 +25,16 @@ const instance = axios.create({
         //@ts-ignore
         ...axios.defaults.transformRequest,
     ],
+});
+
+instance.interceptors.request.use(config => {
+    config.paramsSerializer = params => {
+        return qs.stringify(humps.decamelizeKeys(params), {
+            arrayFormat: 'indices',
+            encode: false,
+        });
+    };
+    return config;
 });
 
 const setTokenHeader = (token: string) => {
@@ -62,6 +74,10 @@ const api: IApi = {
             .then(axiosResponse => {
                 const response: IResponse<T> = axiosResponse.data;
                 //return the date we needed directly
+                if (response.code === 401) {
+                    //redirect to login page
+                    Navigator.goto('/auth/login');
+                }
                 if (response.code >= 400) {
                     //if it's a error
                     return Promise.reject({
@@ -80,11 +96,15 @@ function produceMethod<T>(method: string) {
         beforeParams: IObject,
         configs: IApiRequestOptions,
     ) {
-        const { url, data } = generateUrlParams(beforeUrl, beforeParams);
+        const { url, data, params } = generateUrlParams(
+            beforeUrl,
+            beforeParams,
+        );
         return api.request<T>({
             ...configs,
             method,
             url,
+            params,
             data,
         });
     };

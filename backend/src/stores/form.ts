@@ -1,13 +1,10 @@
 import { RootStore } from '@stores';
 import { action, observable, runInAction } from 'mobx';
-import { IObject } from '@interfaces';
+import { IAsyncFunction, IObject } from '@interfaces';
 import { each } from 'lodash';
-import { WrappedFormUtils } from 'antd/lib/form/Form';
 
 export class FormStore {
     private rootStore: RootStore;
-
-    form?: WrappedFormUtils;
 
     @observable fields: IObject = {};
     @observable initiated: boolean = false;
@@ -37,8 +34,8 @@ export class FormStore {
         });
     }
 
-    @action async init(initFields: () => Promise<IObject>) {
-        const fields = await initFields();
+    @action async init(initFields: IAsyncFunction) {
+        const fields: IObject = await initFields();
         runInAction(() => {
             each(fields, (field, key) => {
                 this.fields[key] = {

@@ -1,20 +1,14 @@
 import { Redirect, Route, RouteProps, Router, Switch } from 'react-router';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Index, Auth, Exception, TagAdmin } from '@pages';
+import { Auth, Exception, Index, TagAdmin } from '@pages';
 import { history } from '@utils';
 import { ImmortalLayout } from '@components';
 import { useCheckStatus } from '@hooks';
-import { IPermissions, IRoles } from '@interfaces';
+import { IAuthChecker } from '@interfaces';
 import { DEFAULT_FORBIDDEN } from '@configs';
 
-interface AuthProps extends RouteProps {
-    requirePermissions?: IPermissions;
-    requireRoles?: IRoles;
-    forbiddenRoles?: IRoles;
-    notFound?: boolean;
-}
-
+type AuthProps = RouteProps & IAuthChecker;
 export const AuthRoute = observer((props: AuthProps) => {
     const {
         component: Component,
@@ -59,6 +53,7 @@ const ImmortalRouter = () => (
                     <ImmortalLayout {...props}>
                         <Switch>
                             <AuthRoute
+                                requirePermissions={{ tag: 2 }}
                                 exact
                                 path='/tags'
                                 component={TagAdmin}

@@ -1,14 +1,21 @@
-import { CommonStore, UserStore, FormStore } from '@stores';
-import { IObject } from '@interfaces';
+import {
+    CommonStore,
+    FormStore,
+    IConfig,
+    TableStore,
+    UserStore,
+} from '@stores';
+import { IAsyncFunction } from '@interfaces';
 
-export type FormsStore = {
-    [key: string]: FormStore;
+export type StoreCollection<T> = {
+    [key: string]: T;
 };
 
 export class RootStore {
     user: UserStore;
     common: CommonStore;
-    forms: FormsStore = {};
+    forms: StoreCollection<FormStore> = {};
+    tables: StoreCollection<TableStore<any>> = {};
 
     constructor() {
         this.user = new UserStore(this);
@@ -17,15 +24,32 @@ export class RootStore {
 
     async createFormStore(
         key: string,
-        initFields: () => Promise<IObject>,
+        initFields: IAsyncFunction,
         refresh: boolean = false,
     ) {
-        if (this.forms.hasOwnProperty(key)) {
+        if (this.forms.hasOwnProperty(key) && !refresh) {
             //form had been created
-            return refresh && this.forms[key].init(initFields);
+            return;
         }
         this.forms[key] = new FormStore(this);
         return this.forms[key].init(initFields);
+    }
+
+    createTableStore<T>(
+        key: string,
+        apiPath: string,
+        formKey?: string,
+        configs?: IConfig<T>,
+        refresh: boolean = false,
+    ) {
+        if (this.tables.hasOwnProperty(key) && !refresh) {
+            return;
+        }
+        this.tables[key] = new TableStore(this, apiPath);
+        //set table configs
+        configs && this.tables[key].setConfig(configs);
+        //bind form
+        formKey && this.tables[key].bindForm(formKey);
     }
 }
 

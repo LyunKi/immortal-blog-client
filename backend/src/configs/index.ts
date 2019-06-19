@@ -6,7 +6,7 @@ const UNKNOWN_ERROR = 500;
 const Immortal = {
     Success: {
         code: SUCCESS,
-        message: 'Request success',
+        message: 'Request successfully',
     },
     UnknownError: {
         code: UNKNOWN_ERROR,

@@ -22,7 +22,7 @@ const Auth = ({
     <div className={'auth-container'}>
         <Logo className={'login-logo'} />
         <div className={'form-container'}>
-            {actionType === 'login' ? <LoginForm /> : <RegisterForm />}
+            {actionType !== 'register' ? <LoginForm /> : <RegisterForm />}
         </div>
     </div>
 );

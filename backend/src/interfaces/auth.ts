@@ -39,5 +39,12 @@ export interface IRegisterRequest {
     sex: number;
 }
 
+export interface IAuthChecker {
+    requirePermissions?: IPermissions;
+    requireRoles?: IRoles;
+    forbiddenRoles?: IRoles;
+    notFound?: boolean;
+}
+
 export type IExceptionStatus = '404' | '403';
 export type IAuthStatus = '401' | '403' | '404' | '200';

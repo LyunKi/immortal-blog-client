@@ -1,5 +1,7 @@
 export * from './api';
 export * from './auth';
+export * from './tag';
+export * from './table';
 
 export interface IObject {
     [key: string]: any;

@@ -27,7 +27,6 @@ export class UserStore {
         this.rootStore.forms.loginForm.showLoading();
         AuthApi.login(params)
             .then(({ token, privileges, userInfo }) => {
-                console.warn(userInfo);
                 //store the token or refresh token
                 setTokenHeader(token);
                 //get privileges of current user
@@ -41,7 +40,7 @@ export class UserStore {
                     privileges: this.privileges,
                     userInfo: userInfo,
                 });
-                message.success('Login success');
+                message.success('Login successfully');
                 Navigator.goto('/index');
             })
             .catch(error => {
@@ -52,27 +51,28 @@ export class UserStore {
 
     @action register(params: IRegisterRequest) {
         this.rootStore.forms.registerForm.showLoading();
-        AuthApi.register(params).then(() => {
-            //register success,and then redirect to the login page
-            message.success('Register success');
-            this.rootStore
-                .createFormStore(
-                    'loginForm',
-                    async () => {
-                        //auto complete the login form
-                        return {
-                            nickname: params.nickname,
-                            password: params.password,
-                            remember: true,
-                        };
-                    },
-                    true,
-                )
-                .then(() => {
-                    Navigator.goto('/auth/login');
-                });
-        });
-        this.rootStore.forms.registerForm.hideLoading();
+        AuthApi.register(params)
+            .then(() => {
+                //register success,and then redirect to the login page
+                message.success('Register successfully');
+                this.rootStore
+                    .createFormStore(
+                        'loginForm',
+                        async () => {
+                            //auto complete the login form
+                            return {
+                                nickname: params.nickname,
+                                password: params.password,
+                                remember: true,
+                            };
+                        },
+                        true,
+                    )
+                    .then(() => {
+                        Navigator.goto('/auth/login');
+                    });
+            })
+            .finally(this.rootStore.forms.registerForm.hideLoading);
     }
 
     @action

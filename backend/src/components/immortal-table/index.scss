@@ -1,0 +1,40 @@
+@import '../../assets/styles/mixin';
+.immortal-table {
+    .ant-pagination-total-text {
+        color: $text-color-secondary;
+    }
+    .operations {
+        text-align: right;
+    }
+    .operation {
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+    .table {
+        .ant-form-item {
+            margin-bottom: 0;
+            width: 120px;
+        }
+        .ant-form-explain {
+            position: absolute;
+            font-size: 12px;
+            margin-top: -4px;
+        }
+        td {
+            padding-top: 0;
+            padding-bottom: 0;
+            min-height: 73px;
+            height: 73px;
+        }
+    }
+    .table-actions {
+        .table-action {
+            color: $link-color;
+            cursor: pointer;
+            &.disabled {
+                color: $disabled-color;
+                cursor: not-allowed;
+            }
+        }
+    }
+}

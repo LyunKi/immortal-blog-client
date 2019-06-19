@@ -11,6 +11,7 @@ export const useCheckStatus = (
     notFound?: boolean,
 ): IAuthStatus => {
     const { user } = useStore(['user']);
+    console.warn(user);
     //Firstly , authorized?
     if (!user.hasAuthorized) {
         return '401';
@@ -31,8 +32,8 @@ export const useCheckStatus = (
             requirePermissions,
             (level, key) =>
                 Math.max(
-                    get(permissions, `${key}.level`, 0),
-                    get(permissions, 'all.level', 0),
+                    get(permissions, `${key}`, 0),
+                    get(permissions, 'all', 0),
                 ) < level,
         )
     ) {
@@ -56,10 +57,10 @@ export const useConfirmSamePassword = (password: string) => {
 
 export const useCheckRepeatedName = () => {
     return useDebounce((_, value, callback) => {
-        AuthApi.getUserByConditions({
+        AuthApi.checkIsRepeated({
             nickname: value,
-        }).then(userInfo => {
-            if (!!userInfo) {
+        }).then(isRepeated => {
+            if (isRepeated) {
                 callback('This nickname already exists');
             } else {
                 callback();

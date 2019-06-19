@@ -7,16 +7,17 @@ import { createLazyForm } from '@utils';
 import { useStore } from '@hooks';
 import { FormComponentProps, FormProps } from 'antd/lib/form';
 
+const FORM_KEY = 'loginForm';
 const initLoginFormFields = async () => ({
-    nickname: '',
-    password: '',
+    nickname: undefined,
+    password: undefined,
     remember: true,
 });
 
 const Item = Form.Item;
 const Password = Input.Password;
 
-const LoginForm = createLazyForm(
+const LoginForm = createLazyForm(FORM_KEY, initLoginFormFields)(
     observer(({ form }: FormComponentProps) => {
         const { getFieldDecorator, validateFields } = form;
         const {
@@ -105,8 +106,6 @@ const LoginForm = createLazyForm(
             </Form>
         );
     }),
-    'loginForm',
-    initLoginFormFields,
 );
 
 export default LoginForm;

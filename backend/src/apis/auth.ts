@@ -19,7 +19,14 @@ export class AuthApi {
         return api.get<IPrivileges>('/privileges');
     }
     static getUserByConditions(conditions: IObject) {
-        return api.get<IUserInfo>('/users', {
+        return api.get<IUserInfo[]>('/users', {
+            $query: {
+                ...conditions,
+            },
+        });
+    }
+    static checkIsRepeated(conditions: IObject) {
+        return api.get<boolean>('/users/is_repeated', {
             $query: {
                 ...conditions,
             },
