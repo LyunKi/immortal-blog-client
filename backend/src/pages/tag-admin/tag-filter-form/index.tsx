@@ -25,7 +25,8 @@ const Index = createLazyForm(FILTER_FORM_KEY, initTagFilterForm)(
         }, [resetFields]);
         const {
             tables: { tagTable },
-        } = useStore(['tables']);
+            user,
+        } = useStore(['tables', 'user']);
         const onSubmit = useCallback(
             event => {
                 event.preventDefault();
@@ -54,6 +55,9 @@ const Index = createLazyForm(FILTER_FORM_KEY, initTagFilterForm)(
                 xl: {
                     span: 7,
                 },
+                lg: {
+                    span: 9,
+                },
             },
             wrapperCol: {
                 xxl: {
@@ -62,10 +66,14 @@ const Index = createLazyForm(FILTER_FORM_KEY, initTagFilterForm)(
                 xl: {
                     span: 17,
                 },
+                lg: {
+                    span: 15,
+                },
             },
             onReset,
             onSubmit,
         };
+        const operationOffset = user.hasRole('immortal') ? 0 : 8;
         return (
             <Form {...formProps}>
                 <Row type={'flex'} gutter={24}>
@@ -77,7 +85,7 @@ const Index = createLazyForm(FILTER_FORM_KEY, initTagFilterForm)(
                         </Item>
                     </Col>
                     <Auth
-                        requirePermissions={{ tag: 5 }}
+                        requireRoles={['immortal']}
                         render={
                             <Col span={8}>
                                 <Item label={'Created By'}>
@@ -137,19 +145,23 @@ const Index = createLazyForm(FILTER_FORM_KEY, initTagFilterForm)(
                             )}
                         </Item>
                     </Col>
-                </Row>
-                <Row>
-                    <Col span={24} className={'operations'}>
-                        <Tooltip title='Search'>
-                            <Button
-                                icon={'search'}
-                                htmlType={'submit'}
-                                type={'primary'}
-                            />
-                        </Tooltip>
-                        <Tooltip title='Reset'>
-                            <Button icon={'sync'} htmlType={'reset'} />
-                        </Tooltip>
+                    <Col offset={operationOffset} span={8}>
+                        <Item
+                            label={' '}
+                            colon={false}
+                            className={'operations'}
+                        >
+                            <Tooltip title='Search'>
+                                <Button
+                                    icon={'search'}
+                                    htmlType={'submit'}
+                                    type={'primary'}
+                                />
+                            </Tooltip>
+                            <Tooltip title='Reset'>
+                                <Button icon={'sync'} htmlType={'reset'} />
+                            </Tooltip>
+                        </Item>
                     </Col>
                 </Row>
             </Form>

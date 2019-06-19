@@ -1,7 +1,7 @@
 import { IAuthStatus, IPermissions, IRoles } from '@interfaces';
-import { isEmpty, get, intersection, some } from 'lodash';
+import { get, intersection, isEmpty, some } from 'lodash';
 import { useDebounce, useStore } from '@hooks';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { AuthApi } from '@apis';
 
 export const useCheckStatus = (
@@ -11,35 +11,31 @@ export const useCheckStatus = (
     notFound?: boolean,
 ): IAuthStatus => {
     const { user } = useStore(['user']);
-    console.warn(user);
-    //Firstly , authorized?
-    if (!user.hasAuthorized) {
-        return '401';
-    }
-    //Secondly, path can be found?
-    if (!!notFound) {
-        return '404';
-    }
-    //Thirdly , forbidden?
-    const userRoles = get(user, 'privileges.roles');
-    const permissions = get(user, 'privileges.permissions');
-    if (!isEmpty(intersection(userRoles, forbiddenRoles))) {
-        return '403';
-    }
-    //Lastly, lack of some permissions or don't have high enough level
-    if (
-        some(
-            requirePermissions,
-            (level, key) =>
-                Math.max(
-                    get(permissions, `${key}`, 0),
-                    get(permissions, 'all', 0),
-                ) < level,
-        )
-    ) {
-        return '403';
-    }
-    return '200';
+    return useMemo(() => {
+        //Firstly , authorized?
+        if (!user.hasAuthorized) {
+            return '401';
+        }
+        //Secondly, path can be found?
+        if (!!notFound) {
+            return '404';
+        }
+        //Thirdly , forbidden?
+        const userRoles = get(user, 'privileges.roles');
+        if (!isEmpty(intersection(userRoles, forbiddenRoles))) {
+            return '403';
+        }
+        //Lastly, lack of some permissions or don't have high enough level
+        if (
+            some(requirePermissions, (level, key) =>
+                user.hasPrivilege(key, level),
+            ) ||
+            some(requireRoles, role => !user.hasRole(role))
+        ) {
+            return '403';
+        }
+        return '200';
+    }, [user, forbiddenRoles, notFound, requirePermissions, requireRoles]);
 };
 
 export const useConfirmSamePassword = (password: string) => {

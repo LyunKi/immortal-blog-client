@@ -2,7 +2,8 @@ import React, { forwardRef, useCallback, useState } from 'react';
 import './index.scss';
 import { IFunction } from '@interfaces';
 import { stopPropagation } from '@utils';
-import { Input } from 'antd';
+import { Popover } from 'antd';
+import { ChromePicker } from 'react-color';
 
 interface IProps {
     value?: string;
@@ -10,31 +11,39 @@ interface IProps {
     onChange?: IFunction;
 }
 
-const ColorPicker = forwardRef(({ value, onChange, disabled }: IProps, _) => {
+const ColorPicker = forwardRef(({ value, onChange, disabled }: IProps) => {
     const [showPicker, setShown] = useState(false);
-    const togglePicker = useCallback(
-        event => {
-            !disabled && setShown(!showPicker);
+    const togglePicker = useCallback(() => {
+        !disabled && setShown(!showPicker);
+    }, [showPicker, disabled, setShown]);
+    const onColorChange = useCallback(
+        color => {
+            onChange && onChange(color.hex);
         },
-        [showPicker, disabled, setShown],
+        [onChange],
     );
-    const onColorChange = onChange && useCallback(onChange, []);
     return (
-        <div
-            className={'color-picker'}
-            onClick={togglePicker}
-            style={{ backgroundColor: value }}
-        >
-            {showPicker && (
-                <div className={'picker-container'} onClick={stopPropagation}>
-                    <Input
-                        placeholder={'color'}
-                        value={value}
+        <Popover
+            visible={showPicker}
+            trigger={'click'}
+            placement={'rightBottom'}
+            overlayClassName={'picker-container'}
+            content={
+                <div onClick={stopPropagation}>
+                    <ChromePicker
+                        color={value}
                         onChange={onColorChange}
+                        disableAlpha={true}
                     />
                 </div>
-            )}
-        </div>
+            }
+        >
+            <div
+                className={'color-picker'}
+                onClick={togglePicker}
+                style={{ backgroundColor: value }}
+            />
+        </Popover>
     );
 });
 export default ColorPicker;

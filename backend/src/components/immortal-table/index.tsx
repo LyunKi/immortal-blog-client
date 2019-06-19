@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Divider, message, Popconfirm, Table, Tooltip } from 'antd';
 import { each, get, map, uniqueId, isEmpty } from 'lodash';
 import { ColumnProps, TableProps } from 'antd/lib/table';
@@ -71,7 +71,6 @@ function createConfirmActions<T>(table: TableStore<T>, form: WrappedFormUtils) {
         {
             text: 'confirm',
             action: (_: any, record: T) => {
-                //@ts-ignore
                 const [method, apiPath] =
                     table.changing && table.changing.type === 'modifying'
                         ? ['put', `${table.apiPath}/${get(record, 'id')}`]
@@ -342,6 +341,7 @@ function Inner<T>(props: ITableProps<T>) {
         ...props,
         columns,
         rowSelection,
+        bordered: true,
         rowKey: getRowKey(props),
         onChange: table.onChange.bind(table),
         loading: table.loading,
@@ -361,7 +361,9 @@ function Inner<T>(props: ITableProps<T>) {
     }, []);
 
     //batch delete operation
-    const isEmptySelected = isEmpty(table.selectedRowKeys);
+    const isEmptySelected = useMemo(() => isEmpty(table.selectedRowKeys), [
+        table.selectedRowKeys,
+    ]);
     const onBatchDelete = useCallback(() => {
         if (isEmptySelected) {
             message.warn('You should select at least one row');
@@ -411,6 +413,7 @@ function Inner<T>(props: ITableProps<T>) {
                         {...props.batchDeletable}
                         render={
                             <Popconfirm
+                                placement={'topRight'}
                                 title={'Sure to execute batch delete'}
                                 onConfirm={onBatchDelete}
                                 visible={visible}

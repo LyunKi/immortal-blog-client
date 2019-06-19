@@ -10,6 +10,7 @@ import {
     IUserInfo,
 } from '@interfaces';
 import { AuthApi } from '@apis';
+import { get } from 'lodash';
 
 export class UserStore {
     private rootStore: RootStore;
@@ -82,6 +83,20 @@ export class UserStore {
             this.userInfo = user.userInfo;
             this.privileges = user.privileges;
         }
+    }
+
+    hasRole(role: string) {
+        return !!this.privileges && this.privileges.roles.includes(role);
+    }
+
+    hasPrivilege(key: string, level: number) {
+        return (
+            !!this.privileges &&
+            Math.max(
+                get(this.privileges.permissions, `${key}`, 0),
+                get(this.privileges.permissions, 'all', 0),
+            ) < level
+        );
     }
 
     constructor(rootStore: RootStore) {

@@ -3,18 +3,17 @@
 .color-picker {
     display: flex;
     align-items: center;
-    position: relative;
     width: 44px;
     height: 32px;
     margin: 4px 0;
     border-radius: 2px;
     border: 1px solid #999;
     box-shadow: 0 0 0 2px $white-color inset;
-
-    .picker-container {
-        position: absolute;
-        width: 80px;
-        right: -4px;
-        transform: translateX(100%);
+}
+.picker-container {
+    .ant-popover-content {
+        .ant-popover-inner-content {
+            padding: 0;
+        }
     }
 }

@@ -2,7 +2,7 @@ import { RootStore } from '@stores/root';
 import { action, computed, observable, runInAction } from 'mobx';
 import { PaginationConfig } from 'antd/lib/pagination';
 import { api } from '@utils';
-import { get as lodashGet } from 'lodash';
+import { get as lodashGet, isEmpty, toString } from 'lodash';
 import { IChanging, IObject, ISorter, TableResponse } from '@interfaces';
 import humps from 'humps';
 
@@ -86,10 +86,10 @@ export class TableStore<T> {
                 perPage: this.pagination.pageSize,
             },
         };
-        if (this.sortInfo) {
+        if (this.sortInfo && !isEmpty(this.sortInfo)) {
             tableParams.orders = [
                 {
-                    field: humps.decamelize(this.sortInfo.field.toString()),
+                    field: humps.decamelize(toString(this.sortInfo.field)),
                     order: this.sortInfo.order,
                 },
             ];
