@@ -1,16 +1,11 @@
 import { RootStore } from '@stores';
 import { action, computed, observable, runInAction } from 'mobx';
 import { message } from 'antd';
-import { Storage, Navigator, setTokenHeader } from '@utils';
-import {
-    ILoginRequest,
-    IPrivileges,
-    IRegisterRequest,
-    IObject,
-    IUserInfo,
-} from '@interfaces';
-import { AuthApi } from '@apis';
+import { Navigator, setTokenHeader, Storage } from '@utils';
+import { ILoginResponse, IObject, IPrivileges, IUserInfo } from '@interfaces';
 import { get } from 'lodash';
+import { FormEvent } from 'react';
+import { APi_PATH } from '@configs';
 
 export class UserStore {
     private rootStore: RootStore;
@@ -24,10 +19,10 @@ export class UserStore {
     @observable userInfo?: IUserInfo;
     @observable privileges?: IPrivileges = undefined;
 
-    @action login(params: ILoginRequest) {
-        this.rootStore.forms.loginForm.showLoading();
-        AuthApi.login(params)
-            .then(({ token, privileges, userInfo }) => {
+    @action login(event: FormEvent) {
+        event.preventDefault();
+        this.rootStore.forms.loginForm.post<ILoginResponse>(
+            ({ token, privileges, userInfo }) => {
                 //store the token or refresh token
                 setTokenHeader(token);
                 //get privileges of current user
@@ -43,37 +38,40 @@ export class UserStore {
                 });
                 message.success('Login successfully');
                 Navigator.goto('/index');
-            })
-            .catch(error => {
+            },
+            error => {
                 message.error(`Login fail,caused by: ${error.message}`);
-            })
-            .finally(this.rootStore.forms.loginForm.hideLoading);
+            },
+        );
     }
 
-    @action register(params: IRegisterRequest) {
-        this.rootStore.forms.registerForm.showLoading();
-        AuthApi.register(params)
-            .then(() => {
+    @action register(event: FormEvent) {
+        event.preventDefault();
+        let autoComplete: IObject = {};
+        this.rootStore.forms.registerForm.post(
+            () => {
                 //register success,and then redirect to the login page
                 message.success('Register successfully');
-                this.rootStore
-                    .createFormStore(
-                        'loginForm',
-                        async () => {
-                            //auto complete the login form
-                            return {
-                                nickname: params.nickname,
-                                password: params.password,
-                                remember: true,
-                            };
-                        },
-                        true,
-                    )
-                    .then(() => {
-                        Navigator.goto('/auth/login');
-                    });
-            })
-            .finally(this.rootStore.forms.registerForm.hideLoading);
+                //create login form store if not exist
+                if (!this.rootStore.forms.hasOwnProperty('loginForm')) {
+                    this.rootStore.createFormStore('loginForm', APi_PATH.login);
+                }
+                //auto complete the login form
+                this.rootStore.forms.loginForm.onValuesChange({
+                    nickname: autoComplete.nickname,
+                    password: autoComplete.password,
+                    remember: true,
+                });
+                Navigator.goto('/auth/login');
+            },
+            undefined,
+            values => {
+                autoComplete = {
+                    ...values,
+                };
+                return values;
+            },
+        );
     }
 
     @action

@@ -1,7 +1,7 @@
 import { IAuthStatus, IPermissions, IRoles } from '@interfaces';
 import { get, intersection, isEmpty, some } from 'lodash';
 import { useDebounce, useStore } from '@hooks';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { AuthApi } from '@apis';
 
 export const useCheckStatus = (
@@ -39,7 +39,7 @@ export const useCheckStatus = (
 };
 
 export const useConfirmSamePassword = (password: string) => {
-    return useCallback(
+    return useDebounce(
         (_, value, callback) => {
             if (value !== password) {
                 callback('The two passwords you entered did not match.');

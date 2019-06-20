@@ -7,6 +7,8 @@ import { createLazyForm } from '@utils';
 import { Form, Input } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import { observer } from 'mobx-react-lite';
+import { useShowScroll } from '@hooks';
+import { APi_PATH } from '@configs';
 
 const TABLE_KEY = 'tagTable';
 const TABLE_FORM_KEY = 'tagTableForm';
@@ -18,13 +20,9 @@ store.createTableStore(TABLE_KEY, '/tags', TABLE_FORM_KEY, {
     },
 });
 
-const initTagTableFormFields = async () => {
-    return {};
-};
-
 const Item = Form.Item;
 
-const TagTable = createLazyForm(TABLE_FORM_KEY, initTagTableFormFields)(
+const TagTable = createLazyForm(TABLE_FORM_KEY, APi_PATH.tags)(
     observer(({ form }: FormComponentProps) => {
         const { getFieldDecorator } = form;
         const columns: IColumnProps<ITag>[] = [
@@ -49,6 +47,7 @@ const TagTable = createLazyForm(TABLE_FORM_KEY, initTagTableFormFields)(
                 title: 'color',
                 dataIndex: 'color',
                 modifiable: true,
+                width: 40,
                 dynamicRender: {
                     control: value => {
                         return (
@@ -88,6 +87,15 @@ const TagTable = createLazyForm(TABLE_FORM_KEY, initTagTableFormFields)(
                 dataIndex: 'updatedBy',
             },
         ];
+        const scroll = useShowScroll(
+            {
+                size: 1430,
+                type: '>',
+            },
+            {
+                x: 1200,
+            },
+        );
         const props = {
             creatable: {
                 requirePermissions: { tag: 3 },
@@ -104,9 +112,7 @@ const TagTable = createLazyForm(TABLE_FORM_KEY, initTagTableFormFields)(
             tableKey: 'tagTable',
             showSelection: true,
             form,
-            scroll: {
-                x: 1200,
-            },
+            scroll,
             columns,
         };
         //@ts-ignore

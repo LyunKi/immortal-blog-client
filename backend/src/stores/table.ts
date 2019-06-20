@@ -1,10 +1,17 @@
-import { RootStore } from '@stores/root';
+import { RootStore } from '@stores';
 import { action, computed, observable, runInAction } from 'mobx';
 import { PaginationConfig } from 'antd/lib/pagination';
 import { api } from '@utils';
 import { get as lodashGet, isEmpty, toString } from 'lodash';
-import { IChanging, IObject, ISorter, TableResponse } from '@interfaces';
+import {
+    IChanging,
+    IFunction,
+    IObject,
+    ISorter,
+    TableResponse,
+} from '@interfaces';
 import humps from 'humps';
+import { message } from 'antd';
 
 export interface IConfig<T> {
     pagination?: PaginationConfig;
@@ -16,14 +23,26 @@ export class TableStore<T> {
     @computed get isChanging() {
         return !!this.changing;
     }
+    @computed get changingType() {
+        return lodashGet(this.changing, 'type');
+    }
+    @computed get changingRecord() {
+        return lodashGet(this.changing, 'record');
+    }
     @computed get datasource() {
         const creatingRow = lodashGet(this.changing, 'record');
-        return lodashGet(this.changing, 'type') === 'creating'
+        return this.changingType === 'creating'
             ? [creatingRow, ...this.data]
             : this.data;
     }
     @computed get changeForm() {
         return this.changeFormKey && this.rootStore.forms[this.changeFormKey];
+    }
+
+    @computed get loading() {
+        return (
+            this.tableLoading || (!!this.changeForm && this.changeForm.loading)
+        );
     }
     @observable changing?: IChanging<T>;
     @observable pagination: PaginationConfig = {
@@ -35,7 +54,7 @@ export class TableStore<T> {
     };
     @observable sortInfo?: ISorter<T>;
     @observable data: T[] = [];
-    @observable loading: boolean = false;
+    @observable tableLoading: boolean = false;
     @observable changeFormKey?: string;
     @observable apiPath: string;
     @observable filters?: IObject;
@@ -50,11 +69,11 @@ export class TableStore<T> {
     }
 
     @action showLoading = () => {
-        this.loading = true;
+        this.tableLoading = true;
     };
 
     @action hideLoading = () => {
-        this.loading = false;
+        this.tableLoading = false;
     };
 
     @action cancelChange() {
@@ -76,6 +95,36 @@ export class TableStore<T> {
         this.fetchData();
     }
 
+    @action confirmAction(
+        successAction?: (reply: T) => any,
+        failAction?: IFunction,
+        borrowValue?: IFunction,
+    ) {
+        if (!this.changing) {
+            return;
+        }
+        if (this.changing.type === 'modifying') {
+            //@ts-ignore
+            this.changeForm.put(successAction, failAction, borrowValue);
+        } else {
+            //@ts-ignore
+            this.changeForm.post(successAction, failAction, borrowValue);
+        }
+    }
+
+    @action delete(ids: any[]) {
+        this.showLoading();
+        api.delete(this.apiPath, { $query: { ids } })
+            .then(num => {
+                message.success(`Successfully delete ${num} records`);
+                runInAction(() => {
+                    this.pagination.current = 1;
+                });
+                this.fetchData();
+            })
+            .finally(this.hideLoading);
+    }
+
     @action fetchData() {
         let tableParams: IObject = {
             data: {
@@ -94,7 +143,7 @@ export class TableStore<T> {
                 },
             ];
         }
-        this.loading = true;
+        this.showLoading();
         api.get<TableResponse<T>>(this.apiPath, { $query: tableParams })
             .then(reply => {
                 runInAction(() => {
@@ -105,13 +154,10 @@ export class TableStore<T> {
                         pageSize: reply.perPage,
                         current: reply.page,
                     };
+                    this.selectedRowKeys = [];
                 });
             })
-            .finally(() => {
-                runInAction(() => {
-                    this.loading = false;
-                });
-            });
+            .finally(this.hideLoading);
     }
 
     @action setConfig(configs: IConfig<T>) {

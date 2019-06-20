@@ -1,3 +1,5 @@
+import { ReactElement } from 'react';
+
 export interface ILoginRequest {
     remember: boolean;
     nickname: string;
@@ -44,6 +46,7 @@ export interface IAuthChecker {
     requireRoles?: IRoles;
     forbiddenRoles?: IRoles;
     notFound?: boolean;
+    fallback?: ReactElement;
 }
 
 export type IExceptionStatus = '404' | '403';

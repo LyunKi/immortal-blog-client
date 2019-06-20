@@ -63,6 +63,15 @@ const MENUS: MultiMenu[] = [
         },
     },
     {
+        key: 'category-admin',
+        name: 'Category Admin',
+        link: '/categories',
+        icon: {
+            type: 'component',
+            value: 'category',
+        },
+    },
+    {
         key: 'blog-admin',
         name: 'Blog Admin',
         icon: {

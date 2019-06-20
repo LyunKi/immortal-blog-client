@@ -7,26 +7,20 @@ import moment from 'moment';
 import { Auth } from '@components';
 import './index.scss';
 import { useStore } from '@hooks';
+import { APi_PATH } from '@configs';
 
-const FILTER_FORM_KEY = 'tagFilterForm';
-
-const initTagFilterForm = async () => {
-    return {};
-};
-
+const FILTER_FORM_KEY = 'categoryFilterForm';
 const Item = Form.Item;
 const RangePicker = DatePicker.RangePicker;
 
-const Index = createLazyForm(FILTER_FORM_KEY, initTagFilterForm)(
+const CategoryFilterForm = createLazyForm(FILTER_FORM_KEY, APi_PATH.categories)(
     observer(({ form }: FormComponentProps) => {
-        const { getFieldDecorator, resetFields, validateFields } = form;
-        const onReset = useCallback(() => {
-            resetFields();
-        }, [resetFields]);
         const {
-            tables: { tagTable },
+            forms: { categoryFilterForm },
+            tables: { categoryTable },
             user,
-        } = useStore(['tables', 'user']);
+        } = useStore(['forms', 'tables', 'user']);
+        const { getFieldDecorator, validateFields } = form;
         const onSubmit = useCallback(
             event => {
                 event.preventDefault();
@@ -34,19 +28,18 @@ const Index = createLazyForm(FILTER_FORM_KEY, initTagFilterForm)(
                     if (err) {
                         return;
                     }
-                    tagTable.submitFilters({
+                    categoryTable.submitFilters({
                         ...values,
                         createdAt: formatTimeRange(values.createdAt),
                         updatedAt: formatTimeRange(values.updatedAt),
                     });
-                    tagTable.fetchData();
+                    categoryTable.fetchData();
                 });
             },
-            [validateFields, tagTable],
+            [validateFields, categoryTable],
         );
         const formProps: FormProps = {
-            className: 'tag-filter-form',
-            layout: 'horizontal',
+            className: 'category-filter-form',
             labelAlign: 'left',
             labelCol: {
                 xxl: {
@@ -70,7 +63,7 @@ const Index = createLazyForm(FILTER_FORM_KEY, initTagFilterForm)(
                     span: 15,
                 },
             },
-            onReset,
+            onReset: categoryFilterForm.resetFields.bind(categoryFilterForm),
             onSubmit,
         };
         const operationOffset = user.hasRole('immortal') ? 0 : 8;
@@ -78,9 +71,9 @@ const Index = createLazyForm(FILTER_FORM_KEY, initTagFilterForm)(
             <Form {...formProps}>
                 <Row type={'flex'} gutter={24}>
                     <Col span={8}>
-                        <Item label={'Tag Name'}>
+                        <Item label={'Name'}>
                             {getFieldDecorator('name')(
-                                <Input placeholder={'Search tag name'} />,
+                                <Input placeholder={'Search category name'} />,
                             )}
                         </Item>
                     </Col>
@@ -169,4 +162,4 @@ const Index = createLazyForm(FILTER_FORM_KEY, initTagFilterForm)(
     }),
 );
 
-export default Index;
+export default CategoryFilterForm;

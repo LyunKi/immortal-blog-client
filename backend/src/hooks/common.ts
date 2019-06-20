@@ -1,5 +1,5 @@
-import { IFunction } from '@interfaces';
-import { useCallback, useState } from 'react';
+import { IFunction, ISizeChecker } from '@interfaces';
+import { useCallback, useEffect, useState } from 'react';
 import { debounce } from 'lodash';
 
 const useDebounce = (func: IFunction, deps: any[], wait: number = 500) => {
@@ -21,4 +21,43 @@ const useAsyncState = <T>() => {
         setError,
     };
 };
-export { useDebounce, useAsyncState };
+
+function getSize() {
+    return {
+        innerHeight: window.innerHeight,
+        innerWidth: window.innerWidth,
+        outerHeight: window.outerHeight,
+        outerWidth: window.outerWidth,
+    };
+}
+
+function useWindowSize() {
+    let [windowSize, setWindowSize] = useState(getSize());
+
+    function handleResize() {
+        setWindowSize(getSize());
+    }
+
+    useEffect(() => {
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    return windowSize;
+}
+
+function useCheckInnerWidth(sizeChecker: ISizeChecker): boolean {
+    const windowSize = useWindowSize();
+    switch (sizeChecker.type) {
+        case '<':
+            return sizeChecker.size < windowSize.innerWidth;
+        case '=':
+            return sizeChecker.size === windowSize.innerWidth;
+        case '>':
+            return sizeChecker.size > windowSize.innerWidth;
+    }
+}
+
+export { useDebounce, useAsyncState, useWindowSize, useCheckInnerWidth };

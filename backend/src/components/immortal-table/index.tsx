@@ -1,41 +1,31 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Divider, message, Popconfirm, Table, Tooltip } from 'antd';
-import { each, get, map, uniqueId, isEmpty } from 'lodash';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { Divider, message, Table } from 'antd';
+import { each, get, isEmpty, map, uniqueId } from 'lodash';
 import { ColumnProps, TableProps } from 'antd/lib/table';
 import { useStore } from '@hooks';
 import { observer } from 'mobx-react-lite';
-import { Link } from 'react-router-dom';
 import { TableStore } from '@stores';
 import './index.scss';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
-import { api } from '@utils';
 import classnames from 'classnames';
-import { IAuthChecker, IFunction } from '@interfaces';
-import { Auth } from '@components';
+import { IAuthChecker, IButtonProps, IFunction } from '@interfaces';
+import { ImmortalButton } from '@components';
+import { ButtonType } from 'antd/lib/button';
 
 const ACTION_CONFIG: ColumnProps<any> = {
     title: 'action',
     key: 'action',
     width: 200,
+    align: 'center',
     fixed: 'right',
 };
 
-interface ILinkAction extends IAuthChecker {
-    link: string;
-    text: string;
-}
+const ACTION_TYPE: ButtonType = 'link';
 
-interface IClickAction<T> extends IAuthChecker {
-    action: (text: any, record: T, index: number, disabled?: boolean) => any;
-    text: string;
-    disabled?: boolean;
-    confirm?: {
-        title: string;
-        placement?: string;
-    };
-}
-
-type IAction<T> = IClickAction<T> | ILinkAction;
+const DEFAULT_ACTION_PROPS = {
+    type: ACTION_TYPE,
+    className: 'table-action',
+};
 
 export interface IColumnProps<T> extends ColumnProps<T> {
     modifiable?: boolean;
@@ -43,23 +33,20 @@ export interface IColumnProps<T> extends ColumnProps<T> {
         display?: (text: any, record: T, index: number) => React.ReactNode;
         control?: (text: any, record: T, index: number) => React.ReactNode;
     };
-    actions?: IAction<T>[];
+    actions?: IButtonProps[];
 }
 
 export interface ITableProps<T> extends TableProps<T> {
     creatable?: IAuthChecker;
     modifiable?: IAuthChecker;
     deletable?: IAuthChecker;
+    operations?: IButtonProps[];
     batchDeletable?: IAuthChecker;
     tableKey: string;
     columns: IColumnProps<T>[];
     form?: WrappedFormUtils;
     rowKey?: string;
     showSelection: boolean;
-}
-
-function isLinkAction<T>(action: IAction<T>): action is ILinkAction {
-    return !!(action as ILinkAction).link;
 }
 
 function getRowKey<T>(props: ITableProps<T>) {
@@ -69,32 +56,30 @@ function getRowKey<T>(props: ITableProps<T>) {
 function createConfirmActions<T>(table: TableStore<T>, form: WrappedFormUtils) {
     return [
         {
-            text: 'confirm',
+            button: {
+                ...DEFAULT_ACTION_PROPS,
+                text: 'confirm',
+            },
             action: (_: any, record: T) => {
-                const [method, apiPath] =
-                    table.changing && table.changing.type === 'modifying'
-                        ? ['put', `${table.apiPath}/${get(record, 'id')}`]
-                        : ['post', table.apiPath];
-                form.validateFields((error, values) => {
-                    if (error) {
-                        return;
-                    }
-                    table.showLoading();
-                    api[method](apiPath, values)
-                        .then(() => {
-                            message.success('Operate successfully');
-                            table.cancelChange();
-                            form.resetFields();
-                            table.fetchData();
-                        })
-                        .finally(table.hideLoading);
-                });
+                const successAction = () => {
+                    message.success('Operate successfully');
+                    table.cancelChange();
+                    form.resetFields();
+                    table.fetchData();
+                };
+                table.confirmAction(successAction, undefined, value => ({
+                    ...value,
+                    id: get(record, 'id'),
+                }));
             },
         },
         {
-            text: 'cancel',
+            button: {
+                ...DEFAULT_ACTION_PROPS,
+                text: 'cancel',
+            },
             confirm: {
-                title: 'sure to give up',
+                title: 'Sure to give up',
             },
             action: () => {
                 table.cancelChange();
@@ -106,8 +91,11 @@ function createConfirmActions<T>(table: TableStore<T>, form: WrappedFormUtils) {
 
 function createModifyAction<T>(table: TableStore<T>, auth: IAuthChecker) {
     return {
-        ...auth,
-        text: 'modify',
+        auth,
+        button: {
+            ...DEFAULT_ACTION_PROPS,
+            text: 'modify',
+        },
         disabled: table.isChanging,
         action: (_: any, record: T, index: number, disabled?: boolean) => {
             if (!!disabled) {
@@ -125,29 +113,26 @@ function createModifyAction<T>(table: TableStore<T>, auth: IAuthChecker) {
 
 function createDeleteAction<T>(table: TableStore<T>, auth: IAuthChecker) {
     return {
-        ...auth,
-        text: 'delete',
+        auth,
+        button: {
+            ...DEFAULT_ACTION_PROPS,
+            text: 'delete',
+        },
         disabled: table.isChanging,
         confirm: {
-            title: 'sure to delete',
+            title: 'Sure to delete',
         },
         action: (_: any, record: T, index: number, disabled?: boolean) => {
             if (!!disabled) {
                 return;
             }
-            table.showLoading();
-            api.delete(table.apiPath, { $query: { ids: [get(record, 'id')] } })
-                .then(num => {
-                    message.success(`Successfully delete ${num} records`);
-                    table.fetchData();
-                })
-                .finally(table.hideLoading);
+            table.delete([get(record, 'id')]);
         },
     };
 }
 
 function renderActionColumn<T>(
-    actions: IAction<T>[] = [],
+    actions: IButtonProps[] = [],
     table: TableStore<T>,
     form: WrappedFormUtils,
     rowKey: string,
@@ -172,71 +157,36 @@ function renderActionColumn<T>(
         return (
             <div className={'table-actions'}>
                 {map(newActions, (action, index) => {
-                    return (
-                        <span key={action.text}>
-                            <Auth
-                                fallback={
-                                    <span
-                                        className={
-                                            'no-auth table-action disabled'
-                                        }
-                                    >
-                                        Forbidden
-                                    </span>
-                                }
-                                requirePermissions={action.requirePermissions}
-                                forbiddenRoles={action.forbiddenRoles}
-                                requireRoles={action.requireRoles}
-                                render={
-                                    <>
-                                        {isLinkAction(action) ? (
-                                            <Link
-                                                key={action.text}
-                                                className={'table-action'}
-                                                to={action.link}
-                                            >
-                                                {action.text}
-                                            </Link>
-                                        ) : !action.disabled &&
-                                          (action as IClickAction<T>)
-                                              .confirm ? (
-                                            <Popconfirm
-                                                //@ts-ignore
-                                                title={action.confirm.title}
-                                                //@ts-ignore
-                                                onConfirm={action.action}
-                                            >
-                                                <span
-                                                    key={action.text}
-                                                    className={'table-action'}
-                                                >
-                                                    {action.text}
-                                                </span>
-                                            </Popconfirm>
-                                        ) : (
-                                            <span
-                                                key={action.text}
-                                                className={classnames(
-                                                    'table-action',
-                                                    {
-                                                        disabled:
-                                                            action.disabled,
-                                                    },
-                                                )}
-                                                onClick={action.action.bind(
-                                                    null,
-                                                    text,
-                                                    record,
-                                                    index,
-                                                    action.disabled,
-                                                )}
-                                            >
-                                                {action.text}
-                                            </span>
-                                        )}
-                                    </>
-                                }
+                    let actionProps = {
+                        ...action,
+                    };
+                    if (actionProps.action) {
+                        actionProps.action = actionProps.action.bind(
+                            null,
+                            text,
+                            record,
+                            index,
+                            action.disabled,
+                        );
+                    }
+                    if (actionProps.auth) {
+                        actionProps.auth.fallback = (
+                            <ImmortalButton
+                                button={{
+                                    text: 'Forbidden',
+                                    type: 'link',
+                                    className: 'no-auth table-action disabled',
+                                }}
                             />
+                        );
+                    }
+                    actionProps.button.className = classnames(
+                        actionProps.button.className,
+                        'table-action',
+                    );
+                    return (
+                        <span key={index}>
+                            <ImmortalButton {...actionProps} />
                             {newActions.length - 1 !== index && (
                                 <Divider type='vertical' />
                             )}
@@ -276,7 +226,7 @@ function transformColumns<T>(props: ITableProps<T>, table: TableStore<T>) {
     let actionColumn: ColumnProps<T> = {
         ...ACTION_CONFIG,
     };
-    let actions: IAction<T>[] = [];
+    let actions: IButtonProps[] = [];
     let rowKey = getRowKey(props);
     each(props.columns, column => {
         //action column
@@ -300,6 +250,7 @@ function transformColumns<T>(props: ITableProps<T>, table: TableStore<T>) {
                     );
                     return renderFunction(value, record, index);
                 },
+                align: 'center',
             };
             if (table.sortInfo) {
                 tempColumn.sortOrder =
@@ -336,6 +287,13 @@ function Inner<T>(props: ITableProps<T>) {
               onChange: table.onSelectChange.bind(table),
           }
         : undefined;
+    //add operations
+    const operations = props.operations || [];
+    const operationLoading = table.loading && !table.isChanging;
+    //get datasource
+    const datasource = useMemo(() => {
+        return !!props.creatable ? table.datasource : table.data;
+    }, [props.creatable, table.datasource, table.data]);
     //transform props
     const transformProps = {
         ...props,
@@ -346,7 +304,7 @@ function Inner<T>(props: ITableProps<T>) {
         onChange: table.onChange.bind(table),
         loading: table.loading,
         pagination: table.pagination,
-        dataSource: table.datasource,
+        dataSource: datasource,
         className: classnames('table', props.className),
     };
     //create operation
@@ -365,24 +323,16 @@ function Inner<T>(props: ITableProps<T>) {
         table.selectedRowKeys,
     ]);
     const onBatchDelete = useCallback(() => {
+        if (table.isChanging) {
+            return;
+        }
         if (isEmptySelected) {
             message.warn('You should select at least one row');
             return;
         }
-        api.delete(table.apiPath, { $query: { ids: table.selectedRowKeys } })
-            .then(num => {
-                message.success(`Successfully delete ${num} records`);
-                table.fetchData();
-            })
-            .finally(table.hideLoading);
+        table.delete(table.selectedRowKeys);
         // eslint-disable-next-line
-    }, [table.selectedRowKeys]);
-
-    //batch delete visibility
-    const [visible, setVisible] = useState(false);
-    const handleVisibleChange = useCallback(() => {
-        setVisible(!isEmptySelected && !visible);
-    }, [visible, setVisible, isEmptySelected]);
+    }, [isEmptySelected, table.isChanging, table.selectedRowKeys]);
 
     //fetch data in the initial
     useEffect(() => {
@@ -393,43 +343,42 @@ function Inner<T>(props: ITableProps<T>) {
         <div className={'immortal-table'}>
             <div className={'operations'}>
                 {props.creatable && (
-                    <Auth
-                        {...props.creatable}
-                        render={
-                            <Tooltip title='Create'>
-                                <Button
-                                    icon={'plus'}
-                                    type={'primary'}
-                                    className={'operation create-button'}
-                                    disabled={table.isChanging}
-                                    onClick={onCreate}
-                                />
-                            </Tooltip>
-                        }
+                    <ImmortalButton
+                        auth={props.creatable}
+                        button={{
+                            loading: operationLoading,
+                            tip: {
+                                title: 'Create',
+                            },
+                            icon: 'plus',
+                            type: 'primary',
+                            className: 'operation create-button',
+                        }}
+                        disabled={table.isChanging}
+                        action={onCreate}
                     />
                 )}
+                {map(operations, (operation, index) => {
+                    operation.button.loading = operationLoading;
+                    return <ImmortalButton key={index} {...operation} />;
+                })}
                 {props.batchDeletable && (
-                    <Auth
-                        {...props.batchDeletable}
-                        render={
-                            <Popconfirm
-                                placement={'topRight'}
-                                title={'Sure to execute batch delete'}
-                                onConfirm={onBatchDelete}
-                                visible={visible}
-                                onVisibleChange={handleVisibleChange}
-                            >
-                                <Tooltip title='Batch Delete'>
-                                    <Button
-                                        icon={'delete'}
-                                        className={'operation delete-button'}
-                                        disabled={
-                                            table.isChanging || isEmptySelected
-                                        }
-                                    />
-                                </Tooltip>
-                            </Popconfirm>
-                        }
+                    <ImmortalButton
+                        auth={props.batchDeletable}
+                        button={{
+                            loading: operationLoading && !isEmptySelected,
+                            tip: {
+                                title: 'Batch Delete',
+                            },
+                            icon: 'delete',
+                            className: 'operation delete-button',
+                        }}
+                        disabled={table.isChanging || isEmptySelected}
+                        action={onBatchDelete}
+                        confirm={{
+                            placement: 'topRight',
+                            title: 'Sure to execute batch delete',
+                        }}
                     />
                 )}
             </div>

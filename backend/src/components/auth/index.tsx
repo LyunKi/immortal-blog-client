@@ -5,7 +5,6 @@ import { DEFAULT_FORBIDDEN } from '@configs';
 
 interface IProps extends IAuthChecker {
     render: ReactElement;
-    fallback?: ReactElement;
 }
 const Auth = ({
     forbiddenRoles = DEFAULT_FORBIDDEN,

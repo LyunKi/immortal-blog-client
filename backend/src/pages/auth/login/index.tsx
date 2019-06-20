@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Button, Checkbox, Form, Icon, Input } from 'antd';
 import { observer } from 'mobx-react-lite';
 import { Link } from 'react-router-dom';
@@ -6,40 +6,24 @@ import './index.scss';
 import { createLazyForm } from '@utils';
 import { useStore } from '@hooks';
 import { FormComponentProps, FormProps } from 'antd/lib/form';
+import { APi_PATH } from '@configs';
 
 const FORM_KEY = 'loginForm';
-const initLoginFormFields = async () => ({
-    nickname: undefined,
-    password: undefined,
-    remember: true,
-});
 
 const Item = Form.Item;
 const Password = Input.Password;
 
-const LoginForm = createLazyForm(FORM_KEY, initLoginFormFields)(
+const LoginForm = createLazyForm(FORM_KEY, APi_PATH.login)(
     observer(({ form }: FormComponentProps) => {
-        const { getFieldDecorator, validateFields } = form;
+        const { getFieldDecorator } = form;
         const {
             forms: { loginForm },
             user,
         } = useStore(['forms', 'user']);
-        const login = useCallback(
-            event => {
-                event.preventDefault();
-                validateFields((err, values) => {
-                    if (err) {
-                        return;
-                    }
-                    user.login(values);
-                });
-            },
-            [validateFields, user],
-        );
         const formProps: FormProps = {
             className: 'login-form',
             layout: 'vertical',
-            onSubmit: login,
+            onSubmit: user.login.bind(user),
         };
         return (
             <Form {...formProps}>
@@ -78,6 +62,7 @@ const LoginForm = createLazyForm(FORM_KEY, initLoginFormFields)(
                 <Item>
                     <div className={'login-remember-forgot'}>
                         {getFieldDecorator('remember', {
+                            initialValue: true,
                             valuePropName: 'checked',
                         })(<Checkbox>Remember me</Checkbox>)}
                         <Link to={'/index'}>Forgot password</Link>

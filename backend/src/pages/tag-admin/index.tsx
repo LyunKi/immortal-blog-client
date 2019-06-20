@@ -1,12 +1,12 @@
 import './index.scss';
 import React from 'react';
-import TagTable from './tag-table';
-import Index from './tag-filter-form';
+import TagTable from './table';
+import TagFilterForm from './filter-form';
 
 const TagAdmin = () => {
     return (
         <div className={'tag-admin'}>
-            <Index />
+            <TagFilterForm />
             <TagTable />
         </div>
     );

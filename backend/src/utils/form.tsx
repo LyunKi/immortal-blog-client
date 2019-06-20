@@ -1,56 +1,36 @@
 import { each } from 'lodash';
-import { Form as AntForm, Icon } from 'antd';
+import { Form as AntForm } from 'antd';
 import { IObject } from '@interfaces';
 import { getStore } from '@stores';
-import React, { ComponentType, PureComponent, Suspense } from 'react';
+import React, { ComponentType } from 'react';
 
 //Provide a easier way to create a form
-async function createForm<T extends ComponentType<any>>(
-    Form: T,
-    formKey: string,
-    initFields: () => Promise<IObject>,
-) {
-    const store = getStore();
-    await store.createFormStore(formKey, initFields);
-    const formStore = store.forms[formKey];
-    const WrapperForm = AntForm.create({
-        mapPropsToFields() {
-            let formFields: IObject = {};
-            each(formStore.fields, (field, key) => {
-                formFields[key] = AntForm.createFormField(field);
-            });
-            return formFields;
-        },
-        onFieldsChange(_, changedFields) {
-            formStore.onFieldsChange(changedFields);
-        },
-        onValuesChange(_, changedValues) {
-            formStore.onValuesChange(changedValues);
-        },
-    })(Form);
-
-    return {
-        // @ts-ignore
-        default: props => <WrapperForm {...props} />,
-    };
-}
-
 export function createLazyForm<T extends ComponentType<any>>(
     formKey: string,
-    initFields: () => Promise<IObject>,
+    apiPath: string,
 ) {
-    return (Form: T) => {
-        const LazyForm = React.lazy(() =>
-            createForm(Form, formKey, initFields),
+    const store = getStore();
+    store.createFormStore(formKey, apiPath);
+    const formStore = store.forms[formKey];
+    return (Form: T) => () => {
+        const EnhancedForm = AntForm.create({
+            mapPropsToFields() {
+                let formFields: IObject = {};
+                each(formStore.fields, (field, key) => {
+                    formFields[key] = AntForm.createFormField(field);
+                });
+                return formFields;
+            },
+            onFieldsChange(_, changedFields) {
+                formStore.onFieldsChange(changedFields);
+            },
+            onValuesChange(_, changedValues) {
+                formStore.onValuesChange(changedValues);
+            },
+        })(Form);
+        return (
+            //@ts-ignore
+            <EnhancedForm ref={ins => (formStore.form = ins)} />
         );
-        return class SuspenseForm extends PureComponent<any> {
-            render() {
-                return (
-                    <Suspense fallback={<Icon type={'loading'} />}>
-                        <LazyForm />
-                    </Suspense>
-                );
-            }
-        };
     };
 }

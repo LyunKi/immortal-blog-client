@@ -1,7 +1,7 @@
 import { Redirect, Route, RouteProps, Router, Switch } from 'react-router';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Auth, Exception, Index, TagAdmin } from '@pages';
+import { Auth, Exception, Index, TagAdmin, CategoryAdmin } from '@pages';
 import { history } from '@utils';
 import { ImmortalLayout } from '@components';
 import { useCheckStatus } from '@hooks';
@@ -57,6 +57,12 @@ const ImmortalRouter = () => (
                                 exact
                                 path='/tags'
                                 component={TagAdmin}
+                            />
+                            <AuthRoute
+                                requirePermissions={{ category: 2 }}
+                                exact
+                                path='/categories'
+                                component={CategoryAdmin}
                             />
                             <AuthRoute exact path='/index' component={Index} />
                             <AuthRoute

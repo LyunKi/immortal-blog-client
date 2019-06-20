@@ -11,7 +11,7 @@ interface IProps {
     onChange?: IFunction;
 }
 
-const ColorPicker = forwardRef(({ value, onChange, disabled }: IProps) => {
+const ColorPicker = forwardRef(({ value, onChange, disabled }: IProps, _) => {
     const [showPicker, setShown] = useState(false);
     const togglePicker = useCallback(() => {
         !disabled && setShown(!showPicker);
@@ -26,6 +26,7 @@ const ColorPicker = forwardRef(({ value, onChange, disabled }: IProps) => {
         <Popover
             visible={showPicker}
             trigger={'click'}
+            onVisibleChange={togglePicker}
             placement={'rightBottom'}
             overlayClassName={'picker-container'}
             content={

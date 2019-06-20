@@ -23,4 +23,21 @@ const METHOD = {
 
 const DEFAULT_FORBIDDEN = ['untouchable'];
 
-export { API_SERVER, SUCCESS, Immortal, METHOD, DEFAULT_FORBIDDEN };
+const ISO_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+
+const APi_PATH = {
+    login: '/login',
+    register: '/register',
+    tags: '/tags',
+    categories: '/categories',
+};
+
+export {
+    API_SERVER,
+    SUCCESS,
+    Immortal,
+    METHOD,
+    ISO_FORMAT,
+    DEFAULT_FORBIDDEN,
+    APi_PATH,
+};

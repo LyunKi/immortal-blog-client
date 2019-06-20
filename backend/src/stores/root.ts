@@ -5,7 +5,6 @@ import {
     TableStore,
     UserStore,
 } from '@stores';
-import { IAsyncFunction } from '@interfaces';
 
 export type StoreCollection<T> = {
     [key: string]: T;
@@ -22,17 +21,12 @@ export class RootStore {
         this.common = new CommonStore(this);
     }
 
-    async createFormStore(
-        key: string,
-        initFields: IAsyncFunction,
-        refresh: boolean = false,
-    ) {
+    createFormStore(key: string, apiPath: string, refresh: boolean = false) {
         if (this.forms.hasOwnProperty(key) && !refresh) {
             //form had been created
             return;
         }
-        this.forms[key] = new FormStore(this);
-        return this.forms[key].init(initFields);
+        this.forms[key] = new FormStore(this, apiPath);
     }
 
     createTableStore<T>(

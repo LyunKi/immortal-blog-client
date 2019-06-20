@@ -1,5 +1,8 @@
 @import '../../assets/styles/mixin';
 .immortal-table {
+    input {
+        text-align: center;
+    }
     .ant-pagination-total-text {
         color: $text-color-secondary;
     }
@@ -7,7 +10,7 @@
         text-align: right;
     }
     .operation {
-        margin-right: 8px;
+        margin-left: 8px;
         margin-bottom: 8px;
     }
     .table {
@@ -29,12 +32,8 @@
     }
     .table-actions {
         .table-action {
-            color: $link-color;
-            cursor: pointer;
-            &.disabled {
-                color: $disabled-color;
-                cursor: not-allowed;
-            }
+            padding: 0;
+            width: 75px;
         }
     }
 }

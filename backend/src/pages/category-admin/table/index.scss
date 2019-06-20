@@ -1,0 +1,9 @@
+.category-table {
+    .ellipse-text {
+        margin-bottom: 0;
+        width: 120px;
+        &:hover {
+            cursor: help;
+        }
+    }
+}

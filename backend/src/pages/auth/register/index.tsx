@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { createLazyForm } from '@utils';
 import { observer } from 'mobx-react-lite';
 import { FormComponentProps, FormProps } from 'antd/lib/form';
@@ -6,39 +6,19 @@ import { Button, Form, Input, Select } from 'antd';
 import './index.scss';
 import { Link } from 'react-router-dom';
 import { useCheckRepeatedName, useConfirmSamePassword, useStore } from '@hooks';
+import { APi_PATH } from '@configs';
 
 const FORM_KEY = 'registerForm';
-const initRegisterFormFields = async () => ({
-    email: undefined,
-    nickname: undefined,
-    password: undefined,
-    confirmPassword: undefined,
-    sex: 2,
-});
-
 const Item = Form.Item;
 const Option = Select.Option;
 
-const RegisterForm = createLazyForm(FORM_KEY, initRegisterFormFields)(
+const RegisterForm = createLazyForm(FORM_KEY, APi_PATH.register)(
     observer(({ form }: FormComponentProps) => {
-        const { getFieldDecorator, validateFields, getFieldValue } = form;
+        const { getFieldDecorator, getFieldValue } = form;
         const {
             forms: { registerForm },
             user,
         } = useStore(['forms', 'user']);
-
-        const register = useCallback(
-            event => {
-                event.preventDefault();
-                validateFields((err, values) => {
-                    if (err) {
-                        return;
-                    }
-                    user.register(values);
-                });
-            },
-            [validateFields, user],
-        );
 
         const confirmSamePassword = useConfirmSamePassword(
             getFieldValue('password'),
@@ -48,7 +28,7 @@ const RegisterForm = createLazyForm(FORM_KEY, initRegisterFormFields)(
         const formProps: FormProps = {
             className: 'register-form',
             layout: 'vertical',
-            onSubmit: register,
+            onSubmit: user.register.bind(user),
         };
         return (
             <Form {...formProps}>
@@ -90,7 +70,9 @@ const RegisterForm = createLazyForm(FORM_KEY, initRegisterFormFields)(
                     )}
                 </Item>
                 <Item>
-                    {getFieldDecorator('sex')(
+                    {getFieldDecorator('sex', {
+                        initialValue: 2,
+                    })(
                         <Select placeholder='Sex' showSearch>
                             <Option value={0}>male</Option>
                             <Option value={1}>female</Option>
