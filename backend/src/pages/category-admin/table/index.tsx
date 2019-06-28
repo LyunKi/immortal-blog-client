@@ -10,12 +10,13 @@ import CategoryTableForm from '../table-form';
 import { useStore } from '@hooks';
 import { uniqueId } from 'lodash';
 import './index.scss';
+import { API_PATH } from '@configs';
 
 const TABLE_KEY = 'categoryTable';
 const TABLE_FORM_KEY = 'categoryTableForm';
 const { Paragraph } = Typography;
 
-store.createTableStore(TABLE_KEY, '/categories', TABLE_FORM_KEY, {
+store.createTableStore(TABLE_KEY, API_PATH.categories, TABLE_FORM_KEY, {
     sortInfo: {
         field: 'updatedAt',
         order: 'descend',
@@ -69,6 +70,7 @@ const CategoryTable = observer(() => {
         },
         {
             key: 'action',
+            width: 225,
             actions: [
                 {
                     button: {

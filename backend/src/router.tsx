@@ -1,14 +1,26 @@
 import { Redirect, Route, RouteProps, Router, Switch } from 'react-router';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Auth, Exception, Index, TagAdmin, CategoryAdmin } from '@pages';
+import {
+    Auth,
+    Exception,
+    Index,
+    TagAdmin,
+    CategoryAdmin,
+    UserAdmin,
+    BlogList,
+} from '@pages';
+import { get } from 'lodash';
 import { history } from '@utils';
 import { ImmortalLayout } from '@components';
 import { useCheckStatus } from '@hooks';
 import { IAuthChecker } from '@interfaces';
 import { DEFAULT_FORBIDDEN } from '@configs';
 
-type AuthProps = RouteProps & IAuthChecker;
+type AuthProps = RouteProps &
+    IAuthChecker & {
+        dynamicRequireSelf?: boolean;
+    };
 export const AuthRoute = observer((props: AuthProps) => {
     const {
         component: Component,
@@ -16,13 +28,20 @@ export const AuthRoute = observer((props: AuthProps) => {
         requirePermissions = {},
         requireRoles = [],
         notFound,
+        dynamicRequireSelf = false,
         ...rest
     } = props;
+    const computedMatch = get(rest, 'computedMatch');
+    let requireUser: string | false = false;
+    if (dynamicRequireSelf && get(computedMatch, 'params.username')) {
+        requireUser = computedMatch.params.userId;
+    }
     const status = useCheckStatus(
         forbiddenRoles,
         requireRoles,
         requirePermissions,
         notFound,
+        requireUser,
     );
     return (
         <Route
@@ -59,10 +78,29 @@ const ImmortalRouter = () => (
                                 component={TagAdmin}
                             />
                             <AuthRoute
+                                requirePermissions={{ blog: 2 }}
+                                exact
+                                path='/blogs'
+                                component={BlogList}
+                            />
+                            <AuthRoute
                                 requirePermissions={{ category: 2 }}
                                 exact
                                 path='/categories'
                                 component={CategoryAdmin}
+                            />
+                            <AuthRoute
+                                requireRoles={['immortal']}
+                                exact
+                                path='/users'
+                                component={UserAdmin}
+                            />
+                            <AuthRoute
+                                forbiddenRoles={[]}
+                                exact
+                                path='/user-center/:username'
+                                dynamicRequireSelf
+                                component={UserAdmin}
                             />
                             <AuthRoute exact path='/index' component={Index} />
                             <AuthRoute

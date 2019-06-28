@@ -6,14 +6,14 @@ import './index.scss';
 import { createLazyForm } from '@utils';
 import { useStore } from '@hooks';
 import { FormComponentProps, FormProps } from 'antd/lib/form';
-import { APi_PATH } from '@configs';
+import { API_PATH } from '@configs';
 
 const FORM_KEY = 'loginForm';
 
 const Item = Form.Item;
 const Password = Input.Password;
 
-const LoginForm = createLazyForm(FORM_KEY, APi_PATH.login)(
+const LoginForm = createLazyForm(FORM_KEY, API_PATH.login)(
     observer(({ form }: FormComponentProps) => {
         const { getFieldDecorator } = form;
         const {

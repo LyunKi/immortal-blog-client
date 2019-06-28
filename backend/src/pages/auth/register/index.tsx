@@ -6,13 +6,13 @@ import { Button, Form, Input, Select } from 'antd';
 import './index.scss';
 import { Link } from 'react-router-dom';
 import { useCheckRepeatedName, useConfirmSamePassword, useStore } from '@hooks';
-import { APi_PATH } from '@configs';
+import { API_PATH } from '@configs';
 
 const FORM_KEY = 'registerForm';
 const Item = Form.Item;
 const Option = Select.Option;
 
-const RegisterForm = createLazyForm(FORM_KEY, APi_PATH.register)(
+const RegisterForm = createLazyForm(FORM_KEY, API_PATH.register)(
     observer(({ form }: FormComponentProps) => {
         const { getFieldDecorator, getFieldValue } = form;
         const {
@@ -45,7 +45,7 @@ const RegisterForm = createLazyForm(FORM_KEY, APi_PATH.register)(
                 <Item hasFeedback>
                     {getFieldDecorator('email', {
                         rules: [{ required: true, type: 'email' }],
-                    })(<Input placeholder='Email' />)}
+                    })(<Input type={'email'} placeholder='Email' />)}
                 </Item>
                 <Item hasFeedback>
                     {getFieldDecorator('password', {
@@ -73,7 +73,11 @@ const RegisterForm = createLazyForm(FORM_KEY, APi_PATH.register)(
                     {getFieldDecorator('sex', {
                         initialValue: 2,
                     })(
-                        <Select placeholder='Sex' showSearch>
+                        <Select
+                            optionFilterProp={'children'}
+                            placeholder='User Gender'
+                            showSearch
+                        >
                             <Option value={0}>male</Option>
                             <Option value={1}>female</Option>
                             <Option value={2}>unknown gender</Option>

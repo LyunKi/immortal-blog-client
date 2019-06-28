@@ -5,7 +5,7 @@ import { Navigator, setTokenHeader, Storage } from '@utils';
 import { ILoginResponse, IObject, IPrivileges, IUserInfo } from '@interfaces';
 import { get } from 'lodash';
 import { FormEvent } from 'react';
-import { APi_PATH } from '@configs';
+import { API_PATH } from '@configs';
 
 export class UserStore {
     private rootStore: RootStore;
@@ -54,7 +54,7 @@ export class UserStore {
                 message.success('Register successfully');
                 //create login form store if not exist
                 if (!this.rootStore.forms.hasOwnProperty('loginForm')) {
-                    this.rootStore.createFormStore('loginForm', APi_PATH.login);
+                    this.rootStore.createFormStore('loginForm', API_PATH.login);
                 }
                 //auto complete the login form
                 this.rootStore.forms.loginForm.onValuesChange({

@@ -2,13 +2,14 @@ import { IAuthStatus, IPermissions, IRoles } from '@interfaces';
 import { get, intersection, isEmpty, some } from 'lodash';
 import { useDebounce, useStore } from '@hooks';
 import { useMemo } from 'react';
-import { AuthApi } from '@apis';
+import { ApiAction } from '@apis';
 
 export const useCheckStatus = (
     forbiddenRoles: IRoles,
     requireRoles: IRoles,
     requirePermissions: IPermissions,
     notFound?: boolean,
+    requireUser: string | false = false,
 ): IAuthStatus => {
     const { user } = useStore(['user']);
     return useMemo(() => {
@@ -25,6 +26,14 @@ export const useCheckStatus = (
         if (!isEmpty(intersection(userRoles, forbiddenRoles))) {
             return '403';
         }
+        //Fourthly , require user?
+        if (
+            requireUser !== false &&
+            (get(user, 'userInfo.nickname') !== requireUser &&
+                !userRoles.includes('immortal'))
+        ) {
+            return '403';
+        }
         //Lastly, lack of some permissions or don't have high enough level
         if (
             some(requirePermissions, (level, key) =>
@@ -35,7 +44,14 @@ export const useCheckStatus = (
             return '403';
         }
         return '200';
-    }, [user, forbiddenRoles, notFound, requirePermissions, requireRoles]);
+    }, [
+        user,
+        forbiddenRoles,
+        requireUser,
+        notFound,
+        requirePermissions,
+        requireRoles,
+    ]);
 };
 
 export const useConfirmSamePassword = (password: string) => {
@@ -53,7 +69,7 @@ export const useConfirmSamePassword = (password: string) => {
 
 export const useCheckRepeatedName = () => {
     return useDebounce((_, value, callback) => {
-        AuthApi.checkIsRepeated({
+        ApiAction.checkIsRepeated({
             nickname: value,
         }).then(isRepeated => {
             if (isRepeated) {

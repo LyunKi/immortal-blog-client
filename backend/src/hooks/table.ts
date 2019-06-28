@@ -3,8 +3,8 @@ import { useCheckInnerWidth } from '@hooks';
 import { useMemo } from 'react';
 
 export function useShowScroll(sizeChecker: ISizeChecker, scroll: IScroll) {
-    const need = !useCheckInnerWidth(sizeChecker);
+    const noNeed = !useCheckInnerWidth(sizeChecker);
     return useMemo(() => {
-        return need ? undefined : scroll;
-    }, [need, scroll]);
+        return noNeed ? undefined : scroll;
+    }, [noNeed, scroll]);
 }

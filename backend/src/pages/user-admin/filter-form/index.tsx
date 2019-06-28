@@ -1,23 +1,33 @@
 import { createLazyForm, formatTimeRange } from '@utils';
 import { observer } from 'mobx-react-lite';
-import { Button, Col, DatePicker, Form, Input, Row, Tooltip } from 'antd';
+import {
+    Button,
+    Col,
+    DatePicker,
+    Form,
+    Input,
+    Row,
+    Select,
+    Tooltip,
+} from 'antd';
 import React, { useCallback } from 'react';
 import { FormComponentProps, FormProps } from 'antd/lib/form';
 import moment from 'moment';
 import './index.scss';
 import { useStore } from '@hooks';
 import { API_PATH } from '@configs';
+import { ImmortalSelect } from '@components';
 
-const FILTER_FORM_KEY = 'tagFilterForm';
-
+const FILTER_FORM_KEY = 'userFilterForm';
 const Item = Form.Item;
+const Option = Select.Option;
 const RangePicker = DatePicker.RangePicker;
 
-const TagFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
+const UserFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.users)(
     observer(({ form }: FormComponentProps) => {
         const {
-            forms: { tagFilterForm },
-            tables: { tagTable },
+            forms: { userFilterForm },
+            tables: { userTable },
         } = useStore(['forms', 'tables']);
         const { getFieldDecorator, validateFields } = form;
         const onSubmit = useCallback(
@@ -27,19 +37,18 @@ const TagFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
                     if (err) {
                         return;
                     }
-                    tagTable.submitFilters({
+                    userTable.submitFilters({
                         ...values,
                         createdAt: formatTimeRange(values.createdAt),
                         updatedAt: formatTimeRange(values.updatedAt),
                     });
-                    tagTable.fetchData();
+                    userTable.fetchData();
                 });
             },
-            [validateFields, tagTable],
+            [validateFields, userTable],
         );
         const formProps: FormProps = {
-            className: 'tag-filter-form',
-            layout: 'horizontal',
+            className: 'user-filter-form',
             labelAlign: 'left',
             labelCol: {
                 xxl: {
@@ -63,56 +72,57 @@ const TagFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
                     span: 15,
                 },
             },
-            onReset: tagFilterForm.resetFields.bind(tagFilterForm),
+            onReset: userFilterForm.resetFields.bind(userFilterForm),
             onSubmit,
         };
         return (
             <Form {...formProps}>
                 <Row type={'flex'} gutter={24}>
                     <Col span={8}>
-                        <Item label={'Name'}>
-                            {getFieldDecorator('name')(
-                                <Input placeholder={'Search tag name'} />,
+                        <Item label={'Nickname'}>
+                            {getFieldDecorator('nickname')(
+                                <Input placeholder={'Search user nickname'} />,
                             )}
                         </Item>
                     </Col>
                     <Col span={8}>
-                        <Item label={'Created By'}>
-                            {getFieldDecorator('createdBy')(
-                                <Input placeholder={'Search create user'} />,
+                        <Item label={'User Email'}>
+                            {getFieldDecorator('email', {
+                                rules: [{ type: 'email' }],
+                            })(<Input type={'email'} placeholder='Email' />)}
+                        </Item>
+                    </Col>
+                    <Col span={8}>
+                        <Item label={'User Gender'}>
+                            {getFieldDecorator('sex')(
+                                <Select
+                                    placeholder='User Gender'
+                                    showSearch
+                                    optionFilterProp={'children'}
+                                    allowClear
+                                >
+                                    <Option value={0}>male</Option>
+                                    <Option value={1}>female</Option>
+                                    <Option value={2}>unknown gender</Option>
+                                </Select>,
+                            )}
+                        </Item>
+                    </Col>
+                    <Col span={8}>
+                        <Item label={'User Roles'}>
+                            {getFieldDecorator('roles')(
+                                <ImmortalSelect
+                                    apiPath={API_PATH.role_options}
+                                    placeholder='User Roles'
+                                    mode={'multiple'}
+                                    allowClear
+                                />,
                             )}
                         </Item>
                     </Col>
                     <Col span={8}>
                         <Item label={'Created At'}>
                             {getFieldDecorator('createdAt')(
-                                <RangePicker
-                                    style={{ width: '100%' }}
-                                    ranges={{
-                                        Today: [
-                                            moment().startOf('day'),
-                                            moment().endOf('day'),
-                                        ],
-                                        'This Month': [
-                                            moment().startOf('month'),
-                                            moment().endOf('month'),
-                                        ],
-                                    }}
-                                    showTime
-                                />,
-                            )}
-                        </Item>
-                    </Col>
-                    <Col span={8}>
-                        <Item label={'Updated By'}>
-                            {getFieldDecorator('updatedBy')(
-                                <Input placeholder={'Search update user'} />,
-                            )}
-                        </Item>
-                    </Col>
-                    <Col span={8}>
-                        <Item label={'Updated At'}>
-                            {getFieldDecorator('updatedAt')(
                                 <RangePicker
                                     style={{ width: '100%' }}
                                     ranges={{
@@ -154,4 +164,4 @@ const TagFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
     }),
 );
 
-export default TagFilterForm;
+export default UserFilterForm;

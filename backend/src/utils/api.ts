@@ -10,6 +10,7 @@ import {
 } from '@utils';
 import humps from 'humps';
 import qs from 'qs';
+import { message } from 'antd';
 
 const instance = axios.create({
     baseURL: API_SERVER,
@@ -58,6 +59,15 @@ const api: IApi = {
         return instance(options)
             .catch(error => {
                 if (error.response) {
+                    if (error.response.status === 401) {
+                        //redirect to login page
+                        Navigator.goto('/auth/login');
+                    }
+                    if (error.response.status === 403) {
+                        message.warn(
+                            'You are not allowed to visit current service',
+                        );
+                    }
                     return Promise.reject({
                         code: error.response.status,
                         message: error.response.statusText,
@@ -77,6 +87,11 @@ const api: IApi = {
                 if (response.code === 401) {
                     //redirect to login page
                     Navigator.goto('/auth/login');
+                }
+                if (response.code === 403) {
+                    message.warn(
+                        'You are not allowed to visit current service',
+                    );
                 }
                 if (response.code >= 400) {
                     //if it's a error

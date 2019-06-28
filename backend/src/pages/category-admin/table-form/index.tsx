@@ -3,7 +3,7 @@ import { Form, Input, message } from 'antd';
 import { FormComponentProps, FormProps } from 'antd/lib/form';
 import { observer } from 'mobx-react-lite';
 import { createLazyForm } from '@utils';
-import { APi_PATH } from '@configs';
+import { API_PATH } from '@configs';
 import { ImmortalButton } from '@components';
 import { useStore } from '@hooks';
 import './index.scss';
@@ -13,7 +13,7 @@ const { TextArea } = Input;
 
 const TABLE_FORM_KEY = 'categoryTableForm';
 
-const CategoryTableForm = createLazyForm(TABLE_FORM_KEY, APi_PATH.categories)(
+const CategoryTableForm = createLazyForm(TABLE_FORM_KEY, API_PATH.categories)(
     observer(({ form }: FormComponentProps) => {
         const {
             tables: { categoryTable },
@@ -56,9 +56,10 @@ const CategoryTableForm = createLazyForm(TABLE_FORM_KEY, APi_PATH.categories)(
                                 loading: categoryTableForm.loading,
                                 text: 'Cancel',
                             }}
-                            action={categoryTable.cancelChange.bind(
-                                categoryTable,
-                            )}
+                            action={() => {
+                                categoryTableForm.resetFields();
+                                categoryTable.cancelChange();
+                            }}
                         />
                         <ImmortalButton
                             auth={{ requirePermissions: { category: 3 } }}

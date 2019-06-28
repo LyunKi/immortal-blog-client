@@ -1,3 +1,4 @@
+export * from './common';
 export * from './storage';
 export * from './generate';
 export * from './form';

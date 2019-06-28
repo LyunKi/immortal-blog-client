@@ -16,3 +16,7 @@ export interface IScroll {
     y?: number;
     x?: number;
 }
+export interface IKeyMap {
+    id: string;
+    name: string;
+}

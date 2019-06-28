@@ -1,5 +1,5 @@
 import { Avatar, Breadcrumb, Icon, Layout, Menu } from 'antd';
-import React, { ReactChild, useCallback } from 'react';
+import React, { ReactChild, useCallback, useMemo } from 'react';
 import './index.scss';
 import { useStore } from '@hooks';
 import { observer } from 'mobx-react-lite';
@@ -42,64 +42,6 @@ type MultiMenu = IMenu | ISubMenu;
 function isSubMenu(menu: MultiMenu): menu is ISubMenu {
     return (menu as ISubMenu).children !== undefined;
 }
-
-const MENUS: MultiMenu[] = [
-    {
-        key: 'user-admin',
-        name: 'User Admin',
-        link: '/users',
-        icon: {
-            type: 'type',
-            value: 'team',
-        },
-    },
-    {
-        key: 'tag-admin',
-        name: 'Tag Admin',
-        link: '/tags',
-        icon: {
-            type: 'type',
-            value: 'tags',
-        },
-    },
-    {
-        key: 'category-admin',
-        name: 'Category Admin',
-        link: '/categories',
-        icon: {
-            type: 'component',
-            value: 'category',
-        },
-    },
-    {
-        key: 'blog-admin',
-        name: 'Blog Admin',
-        icon: {
-            type: 'component',
-            value: 'blog',
-        },
-        children: [
-            {
-                key: 'blogs',
-                name: 'Blogs',
-                link: '/blogs',
-                icon: {
-                    type: 'type',
-                    value: 'unordered-list',
-                },
-            },
-            {
-                key: 'blog-creation',
-                name: 'Blog Creation',
-                link: '/blogs/creation',
-                icon: {
-                    type: 'type',
-                    value: 'file-add',
-                },
-            },
-        ],
-    },
-];
 
 const renderMenu = (menu: IMenu) => (
     <Item key={menu.key}>
@@ -153,15 +95,96 @@ const ImmortalLayout = observer(({ children, location }: IProps) => {
         </Breadcrumb.Item>,
     ].concat(extraBreadcrumbItems);
     const { common, user } = useStore(['common', 'user']);
-    let avatarProps: IObject = {
-        className: 'avatar',
-    };
+    const nickname = get(user, 'userInfo.nickname');
+    const menus: MultiMenu[] = useMemo(() => {
+        return [
+            {
+                key: 'user-admin',
+                name: 'User Admin',
+                link: '/users',
+                icon: {
+                    type: 'type',
+                    value: 'team',
+                },
+            },
+            {
+                key: 'tag-admin',
+                name: 'Tag Admin',
+                link: '/tags',
+                icon: {
+                    type: 'type',
+                    value: 'tags',
+                },
+            },
+            {
+                key: 'category-admin',
+                name: 'Category Admin',
+                link: '/categories',
+                icon: {
+                    type: 'component',
+                    value: 'category',
+                },
+            },
+            {
+                key: 'blog-admin',
+                name: 'Blog Admin',
+                icon: {
+                    type: 'component',
+                    value: 'blog',
+                },
+                children: [
+                    {
+                        key: 'blogs',
+                        name: 'Blogs',
+                        link: '/blogs',
+                        icon: {
+                            type: 'type',
+                            value: 'unordered-list',
+                        },
+                    },
+                    {
+                        key: 'blog-creation',
+                        name: 'Blog Creation',
+                        link: '/blogs/creation',
+                        icon: {
+                            type: 'type',
+                            value: 'file-add',
+                        },
+                    },
+                ],
+            },
+            {
+                key: 'user-page',
+                name: 'User Page',
+                icon: {
+                    type: 'type',
+                    value: 'user',
+                },
+                children: [
+                    {
+                        key: 'user-center',
+                        name: 'User Center',
+                        link: `/user-center/${nickname}`,
+                        icon: {
+                            type: 'type',
+                            value: 'pic-left',
+                        },
+                    },
+                ],
+            },
+        ];
+    }, [nickname]);
     const avatar = get(user, 'userInfo.avatar');
-    if (avatar) {
-        avatarProps.src = avatar;
-    } else {
-        avatarProps.icon = 'user';
-    }
+    const avatarProps = avatar
+        ? {
+              src: avatar,
+              alt: nickname,
+              className: 'avatar img',
+          }
+        : {
+              children: nickname,
+              className: 'avatar string',
+          };
     const onCollapse = useCallback(
         collapsed => {
             common.onCollapse(collapsed);
@@ -184,7 +207,7 @@ const ImmortalLayout = observer(({ children, location }: IProps) => {
                     })}
                 />
                 <Menu theme='dark' mode='inline'>
-                    {map(MENUS, menu => {
+                    {map(menus, menu => {
                         return isSubMenu(menu)
                             ? renderSubMenu(menu as ISubMenu)
                             : renderMenu(menu as IMenu);

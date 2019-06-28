@@ -2,7 +2,11 @@ import { IAsyncFunction } from '@interfaces';
 import { useEffect } from 'react';
 import { useAsyncState } from '@hooks';
 
-export const useFetch = <T>(action: IAsyncFunction, ...params: any[]) => {
+export const useFetch = <T>(
+    initialData: T,
+    action: IAsyncFunction,
+    ...params: any[]
+) => {
     const {
         loading,
         setLoading,
@@ -10,7 +14,7 @@ export const useFetch = <T>(action: IAsyncFunction, ...params: any[]) => {
         setData,
         error,
         setError,
-    } = useAsyncState<T>();
+    } = useAsyncState<T>(initialData);
     useEffect(() => {
         action(...params)
             .then((result: T) => {

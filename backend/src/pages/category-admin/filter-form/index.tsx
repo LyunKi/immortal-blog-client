@@ -4,22 +4,20 @@ import { Button, Col, DatePicker, Form, Input, Row, Tooltip } from 'antd';
 import React, { useCallback } from 'react';
 import { FormComponentProps, FormProps } from 'antd/lib/form';
 import moment from 'moment';
-import { Auth } from '@components';
 import './index.scss';
 import { useStore } from '@hooks';
-import { APi_PATH } from '@configs';
+import { API_PATH } from '@configs';
 
 const FILTER_FORM_KEY = 'categoryFilterForm';
 const Item = Form.Item;
 const RangePicker = DatePicker.RangePicker;
 
-const CategoryFilterForm = createLazyForm(FILTER_FORM_KEY, APi_PATH.categories)(
+const CategoryFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.categories)(
     observer(({ form }: FormComponentProps) => {
         const {
             forms: { categoryFilterForm },
             tables: { categoryTable },
-            user,
-        } = useStore(['forms', 'tables', 'user']);
+        } = useStore(['forms', 'tables']);
         const { getFieldDecorator, validateFields } = form;
         const onSubmit = useCallback(
             event => {
@@ -66,7 +64,6 @@ const CategoryFilterForm = createLazyForm(FILTER_FORM_KEY, APi_PATH.categories)(
             onReset: categoryFilterForm.resetFields.bind(categoryFilterForm),
             onSubmit,
         };
-        const operationOffset = user.hasRole('immortal') ? 0 : 8;
         return (
             <Form {...formProps}>
                 <Row type={'flex'} gutter={24}>
@@ -77,20 +74,13 @@ const CategoryFilterForm = createLazyForm(FILTER_FORM_KEY, APi_PATH.categories)(
                             )}
                         </Item>
                     </Col>
-                    <Auth
-                        requireRoles={['immortal']}
-                        render={
-                            <Col span={8}>
-                                <Item label={'Created By'}>
-                                    {getFieldDecorator('createdBy')(
-                                        <Input
-                                            placeholder={'Search create user'}
-                                        />,
-                                    )}
-                                </Item>
-                            </Col>
-                        }
-                    />
+                    <Col span={8}>
+                        <Item label={'Created By'}>
+                            {getFieldDecorator('createdBy')(
+                                <Input placeholder={'Search create user'} />,
+                            )}
+                        </Item>
+                    </Col>{' '}
                     <Col span={8}>
                         <Item label={'Created At'}>
                             {getFieldDecorator('createdAt')(
@@ -138,7 +128,7 @@ const CategoryFilterForm = createLazyForm(FILTER_FORM_KEY, APi_PATH.categories)(
                             )}
                         </Item>
                     </Col>
-                    <Col offset={operationOffset} span={8}>
+                    <Col span={8}>
                         <Item
                             label={' '}
                             colon={false}

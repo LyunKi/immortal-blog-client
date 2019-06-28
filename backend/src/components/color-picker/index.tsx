@@ -11,7 +11,7 @@ interface IProps {
     onChange?: IFunction;
 }
 
-const ColorPicker = forwardRef(({ value, onChange, disabled }: IProps, _) => {
+const ColorPicker = ({ value, onChange, disabled }: IProps, ref: any) => {
     const [showPicker, setShown] = useState(false);
     const togglePicker = useCallback(() => {
         !disabled && setShown(!showPicker);
@@ -32,6 +32,7 @@ const ColorPicker = forwardRef(({ value, onChange, disabled }: IProps, _) => {
             content={
                 <div onClick={stopPropagation}>
                     <ChromePicker
+                        ref={ref}
                         color={value}
                         onChange={onColorChange}
                         disableAlpha={true}
@@ -46,5 +47,5 @@ const ColorPicker = forwardRef(({ value, onChange, disabled }: IProps, _) => {
             />
         </Popover>
     );
-});
-export default ColorPicker;
+};
+export default forwardRef(ColorPicker);

@@ -25,11 +25,14 @@ const DEFAULT_FORBIDDEN = ['untouchable'];
 
 const ISO_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
-const APi_PATH = {
+const API_PATH = {
     login: '/login',
     register: '/register',
     tags: '/tags',
+    users: '/users',
+    role_options: '/role_options',
     categories: '/categories',
+    blogs: '/blogs',
 };
 
 export {
@@ -39,5 +42,5 @@ export {
     METHOD,
     ISO_FORMAT,
     DEFAULT_FORBIDDEN,
-    APi_PATH,
+    API_PATH,
 };

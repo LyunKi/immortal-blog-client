@@ -13,8 +13,10 @@ export interface IUserInfo {
     phone: string;
     avatar: string;
     sex: number;
-    created_at: string;
-    updated_at: string;
+    createdAt: string;
+    updatedAt: string;
+    activated: boolean;
+    roles: number[];
 }
 
 export interface ILoginResponse {
@@ -46,7 +48,13 @@ export interface IAuthChecker {
     requireRoles?: IRoles;
     forbiddenRoles?: IRoles;
     notFound?: boolean;
+    requireUser?: string | false;
     fallback?: ReactElement;
+}
+
+export interface IRole {
+    name: string;
+    id: number;
 }
 
 export type IExceptionStatus = '404' | '403';

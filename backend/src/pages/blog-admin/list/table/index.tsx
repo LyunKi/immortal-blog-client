@@ -1,6 +1,6 @@
 import { store } from '@stores';
 import { ColorPicker, IColumnProps, ImmortalTable } from '@components';
-import { ITag } from '@interfaces';
+import { IBlog } from '@interfaces';
 import moment from 'moment';
 import React from 'react';
 import { createLazyForm } from '@utils';
@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useShowScroll } from '@hooks';
 import { API_PATH } from '@configs';
 
-const TABLE_KEY = 'tagTable';
-const TABLE_FORM_KEY = 'tagTableForm';
+const TABLE_KEY = 'blogTable';
+const TABLE_FORM_KEY = 'blogTableForm';
 
-store.createTableStore(TABLE_KEY, '/tags', TABLE_FORM_KEY, {
+store.createTableStore(TABLE_KEY, '/blogs', TABLE_FORM_KEY, {
     sortInfo: {
         field: 'updatedAt',
         order: 'descend',
@@ -22,13 +22,13 @@ store.createTableStore(TABLE_KEY, '/tags', TABLE_FORM_KEY, {
 
 const Item = Form.Item;
 
-const TagTable = createLazyForm(TABLE_FORM_KEY, API_PATH.tags)(
+const BlogTable = createLazyForm(TABLE_FORM_KEY, API_PATH.blogs)(
     observer(({ form }: FormComponentProps) => {
         const { getFieldDecorator } = form;
-        const columns: IColumnProps<ITag>[] = [
+        const columns: IColumnProps<IBlog>[] = [
             {
-                title: 'name',
-                dataIndex: 'name',
+                title: 'title',
+                dataIndex: 'title',
                 modifiable: true,
                 width: 165,
                 dynamicRender: {
@@ -99,18 +99,18 @@ const TagTable = createLazyForm(TABLE_FORM_KEY, API_PATH.tags)(
         );
         const props = {
             creatable: {
-                requirePermissions: { tag: 3 },
+                requirePermissions: { blog: 3 },
             },
             deletable: {
-                requirePermissions: { tag: 3 },
+                requirePermissions: { blog: 3 },
             },
             batchDeletable: {
-                requirePermissions: { tag: 3 },
+                requirePermissions: { blog: 3 },
             },
             modifiable: {
-                requirePermissions: { tag: 3 },
+                requirePermissions: { blog: 3 },
             },
-            tableKey: 'tagTable',
+            tableKey: 'blogTable',
             showSelection: true,
             form,
             scroll,
@@ -121,4 +121,4 @@ const TagTable = createLazyForm(TABLE_FORM_KEY, API_PATH.tags)(
     }),
 );
 
-export default TagTable;
+export default BlogTable;

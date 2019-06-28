@@ -8,16 +8,16 @@ import './index.scss';
 import { useStore } from '@hooks';
 import { API_PATH } from '@configs';
 
-const FILTER_FORM_KEY = 'tagFilterForm';
+const FILTER_FORM_KEY = 'blogFilterForm';
 
 const Item = Form.Item;
 const RangePicker = DatePicker.RangePicker;
 
-const TagFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
+const BlogFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
     observer(({ form }: FormComponentProps) => {
         const {
-            forms: { tagFilterForm },
-            tables: { tagTable },
+            forms: { blogFilterForm },
+            tables: { blogTable },
         } = useStore(['forms', 'tables']);
         const { getFieldDecorator, validateFields } = form;
         const onSubmit = useCallback(
@@ -27,18 +27,18 @@ const TagFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
                     if (err) {
                         return;
                     }
-                    tagTable.submitFilters({
+                    blogTable.submitFilters({
                         ...values,
                         createdAt: formatTimeRange(values.createdAt),
                         updatedAt: formatTimeRange(values.updatedAt),
                     });
-                    tagTable.fetchData();
+                    blogTable.fetchData();
                 });
             },
-            [validateFields, tagTable],
+            [validateFields, blogTable],
         );
         const formProps: FormProps = {
-            className: 'tag-filter-form',
+            className: 'blog-filter-form',
             layout: 'horizontal',
             labelAlign: 'left',
             labelCol: {
@@ -63,23 +63,23 @@ const TagFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
                     span: 15,
                 },
             },
-            onReset: tagFilterForm.resetFields.bind(tagFilterForm),
+            onReset: blogFilterForm.resetFields.bind(blogFilterForm),
             onSubmit,
         };
         return (
             <Form {...formProps}>
                 <Row type={'flex'} gutter={24}>
                     <Col span={8}>
-                        <Item label={'Name'}>
-                            {getFieldDecorator('name')(
-                                <Input placeholder={'Search tag name'} />,
+                        <Item label={'Title'}>
+                            {getFieldDecorator('title')(
+                                <Input placeholder={'Search blog title'} />,
                             )}
                         </Item>
                     </Col>
                     <Col span={8}>
-                        <Item label={'Created By'}>
-                            {getFieldDecorator('createdBy')(
-                                <Input placeholder={'Search create user'} />,
+                        <Item label={'Authors'}>
+                            {getFieldDecorator('authors')(
+                                <Input placeholder={'Search authors'} />,
                             )}
                         </Item>
                     </Col>
@@ -104,13 +104,6 @@ const TagFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
                         </Item>
                     </Col>
                     <Col span={8}>
-                        <Item label={'Updated By'}>
-                            {getFieldDecorator('updatedBy')(
-                                <Input placeholder={'Search update user'} />,
-                            )}
-                        </Item>
-                    </Col>
-                    <Col span={8}>
                         <Item label={'Updated At'}>
                             {getFieldDecorator('updatedAt')(
                                 <RangePicker
@@ -130,7 +123,7 @@ const TagFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
                             )}
                         </Item>
                     </Col>
-                    <Col span={8}>
+                    <Col offset={8} span={8}>
                         <Item
                             label={' '}
                             colon={false}
@@ -154,4 +147,4 @@ const TagFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
     }),
 );
 
-export default TagFilterForm;
+export default BlogFilterForm;

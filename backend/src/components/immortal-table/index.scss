@@ -24,16 +24,15 @@
             margin-top: -4px;
         }
         td {
-            padding-top: 0;
-            padding-bottom: 0;
-            min-height: 73px;
-            height: 73px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            min-height: 60px;
+            height: 60px;
         }
     }
     .table-actions {
-        .table-action {
+        button {
             padding: 0;
-            width: 75px;
         }
     }
 }

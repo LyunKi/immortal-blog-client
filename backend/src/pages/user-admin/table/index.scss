@@ -1,0 +1,7 @@
+@import '../../../assets/styles/mixin';
+
+.user-table {
+    .avatar.string {
+        background: $black-color;
+    }
+}

@@ -11,6 +11,7 @@ import classnames from 'classnames';
 import { IAuthChecker, IButtonProps, IFunction } from '@interfaces';
 import { ImmortalButton } from '@components';
 import { ButtonType } from 'antd/lib/button';
+import { interpolate } from '@utils';
 
 const ACTION_CONFIG: ColumnProps<any> = {
     title: 'action',
@@ -143,6 +144,7 @@ function renderActionColumn<T>(
         let newActions = [...actions];
         if (
             table.changing &&
+            modifiable &&
             get(table, `changing.record.${rowKey}`) === get(record, rowKey)
         ) {
             newActions = createConfirmActions(table, form);
@@ -167,6 +169,12 @@ function renderActionColumn<T>(
                             record,
                             index,
                             action.disabled,
+                        );
+                    }
+                    if (actionProps.button.href) {
+                        actionProps.button.href = interpolate(
+                            actionProps.button.href,
+                            record,
                         );
                     }
                     if (actionProps.auth) {
@@ -296,6 +304,9 @@ function Inner<T>(props: ITableProps<T>) {
     }, [props.creatable, table.datasource, table.data]);
     //transform props
     const transformProps = {
+        locale: {
+            emptyText: '--',
+        },
         ...props,
         columns,
         rowSelection,

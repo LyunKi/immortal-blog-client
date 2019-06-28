@@ -8,9 +8,9 @@ const useDebounce = (func: IFunction, deps: any[], wait: number = 500) => {
     // return debounce(func, wait);
 };
 
-const useAsyncState = <T>() => {
+const useAsyncState = <T>(initialData: T) => {
+    const [data, setData] = useState<T>(initialData);
     const [loading, setLoading] = useState(true);
-    const [data, setData] = useState<T | undefined>(undefined);
     const [error, setError] = useState(undefined);
     return {
         loading,
