@@ -70,7 +70,7 @@ const CategoryTable = observer(() => {
         },
         {
             key: 'action',
-            width: 225,
+            width: 200,
             actions: [
                 {
                     button: {
@@ -112,6 +112,7 @@ const CategoryTable = observer(() => {
         },
         operations: [
             {
+                type: 'normal',
                 auth: {
                     requirePermissions: { category: 3 },
                 },

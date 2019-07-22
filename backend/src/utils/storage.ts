@@ -15,6 +15,10 @@ class Storage {
         );
     }
 
+    static removeItem(key: string) {
+        localStorage.removeItem(key);
+    }
+
     static hasItem(key: string) {
         let hasFlag = false;
         const returnValue = window.localStorage.getItem(key);

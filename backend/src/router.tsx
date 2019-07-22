@@ -9,6 +9,8 @@ import {
     CategoryAdmin,
     UserAdmin,
     BlogList,
+    BlogCreation,
+    UserSettings,
 } from '@pages';
 import { get } from 'lodash';
 import { history } from '@utils';
@@ -36,13 +38,13 @@ export const AuthRoute = observer((props: AuthProps) => {
     if (dynamicRequireSelf && get(computedMatch, 'params.username')) {
         requireUser = computedMatch.params.userId;
     }
-    const status = useCheckStatus(
+    const status = useCheckStatus({
         forbiddenRoles,
         requireRoles,
         requirePermissions,
         notFound,
         requireUser,
-    );
+    });
     return (
         <Route
             {...rest}
@@ -90,6 +92,12 @@ const ImmortalRouter = () => (
                                 component={CategoryAdmin}
                             />
                             <AuthRoute
+                                requirePermissions={{ blog: 3 }}
+                                exact
+                                path='/blog-creation'
+                                component={BlogCreation}
+                            />
+                            <AuthRoute
                                 requireRoles={['immortal']}
                                 exact
                                 path='/users'
@@ -98,9 +106,16 @@ const ImmortalRouter = () => (
                             <AuthRoute
                                 forbiddenRoles={[]}
                                 exact
-                                path='/user-center/:username'
+                                path='/users/:nickname'
                                 dynamicRequireSelf
-                                component={UserAdmin}
+                                component={UserSettings}
+                            />
+                            <AuthRoute
+                                forbiddenRoles={[]}
+                                exact
+                                path='/user-center'
+                                dynamicRequireSelf
+                                component={UserSettings}
                             />
                             <AuthRoute exact path='/index' component={Index} />
                             <AuthRoute

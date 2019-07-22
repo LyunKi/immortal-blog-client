@@ -15,4 +15,5 @@ export interface IApi {
     get<T>(...args: any[]): Promise<T>;
     delete<T>(...args: any[]): Promise<T>;
     put<T>(...args: any[]): Promise<T>;
+    upload(...args: any[]): Promise<string[]>;
 }

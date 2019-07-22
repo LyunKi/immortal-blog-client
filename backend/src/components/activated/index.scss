@@ -1,0 +1,11 @@
+.activated {
+    display: inline-flex;
+    align-items: center;
+    .action {
+        display: inline-flex;
+        align-items: center;
+        &:hover {
+            cursor: help;
+        }
+    }
+}

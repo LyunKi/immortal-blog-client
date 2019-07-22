@@ -1,13 +1,11 @@
 import { store } from '@stores';
-import { ColorPicker, IColumnProps, ImmortalTable } from '@components';
+import { IColumnProps, ImmortalTable } from '@components';
 import { IBlog } from '@interfaces';
 import moment from 'moment';
 import React from 'react';
 import { createLazyForm } from '@utils';
-import { Form, Input } from 'antd';
-import { FormComponentProps } from 'antd/lib/form';
+import { Tooltip, Typography } from 'antd';
 import { observer } from 'mobx-react-lite';
-import { useShowScroll } from '@hooks';
 import { API_PATH } from '@configs';
 
 const TABLE_KEY = 'blogTable';
@@ -20,49 +18,30 @@ store.createTableStore(TABLE_KEY, '/blogs', TABLE_FORM_KEY, {
     },
 });
 
-const Item = Form.Item;
+const Paragraph = Typography.Paragraph;
 
 const BlogTable = createLazyForm(TABLE_FORM_KEY, API_PATH.blogs)(
-    observer(({ form }: FormComponentProps) => {
-        const { getFieldDecorator } = form;
+    observer(() => {
         const columns: IColumnProps<IBlog>[] = [
             {
                 title: 'title',
                 dataIndex: 'title',
-                modifiable: true,
-                width: 165,
-                dynamicRender: {
-                    control: value => {
-                        return (
-                            <Item>
-                                {getFieldDecorator('name', {
-                                    rules: [{ required: true }],
-                                    initialValue: value,
-                                })(<Input placeholder='Name' />)}
-                            </Item>
-                        );
-                    },
-                },
             },
             {
-                title: 'color',
-                dataIndex: 'color',
-                width: 40,
-                modifiable: true,
-                dynamicRender: {
-                    control: value => {
-                        return (
-                            <Item style={{ width: 40 }}>
-                                {getFieldDecorator('color', {
-                                    rules: [{ required: true }],
-                                    initialValue: value,
-                                })(<ColorPicker />)}
-                            </Item>
-                        );
-                    },
-                    display: value => {
-                        return <ColorPicker value={value} disabled />;
-                    },
+                title: 'description',
+                dataIndex: 'description',
+                width: 120,
+                render: (value: any) => {
+                    return (
+                        <Tooltip title={value}>
+                            <Paragraph
+                                className={'ellipse-text'}
+                                ellipsis={{ rows: 2 }}
+                            >
+                                {value}
+                            </Paragraph>
+                        </Tooltip>
+                    );
                 },
             },
             {
@@ -71,6 +50,29 @@ const BlogTable = createLazyForm(TABLE_FORM_KEY, API_PATH.blogs)(
                 sorter: (x, y) =>
                     moment(x.createdAt).valueOf() -
                     moment(y.createdAt).valueOf(),
+            },
+            {
+                title: 'tags',
+                dataIndex: 'tags',
+            },
+            {
+                title: 'categories',
+                dataIndex: 'categories',
+            },
+            {
+                title: 'authors',
+                dataIndex: 'authors',
+            },
+            {
+                title: 'published',
+                dataIndex: 'published',
+            },
+            {
+                title: 'comments',
+                dataIndex: 'comments',
+                render: comments => {
+                    return comments.length;
+                },
             },
             {
                 title: 'created by',
@@ -87,32 +89,56 @@ const BlogTable = createLazyForm(TABLE_FORM_KEY, API_PATH.blogs)(
                 title: 'updated by',
                 dataIndex: 'updatedBy',
             },
+            {
+                key: 'action',
+                width: 300,
+                actions: [
+                    {
+                        auth: {
+                            requirePermissions: { blog: 4 },
+                        },
+                        button: {
+                            type: 'link',
+                            text: 'publish',
+                        },
+                    },
+                    {
+                        auth: {
+                            requirePermissions: { blog: 3 },
+                        },
+                        button: {
+                            type: 'link',
+                            text: 'modify',
+                        },
+                    },
+                ],
+            },
         ];
-        const scroll = useShowScroll(
-            {
-                size: 1430,
-                type: '>',
-            },
-            {
-                x: 1200,
-            },
-        );
+        const scroll = {
+            x: 1600,
+        };
         const props = {
-            creatable: {
-                requirePermissions: { blog: 3 },
-            },
             deletable: {
-                requirePermissions: { blog: 3 },
+                requirePermissions: { blog: 4 },
             },
             batchDeletable: {
                 requirePermissions: { blog: 3 },
             },
-            modifiable: {
-                requirePermissions: { blog: 3 },
-            },
+            operations: [
+                {
+                    auth: {
+                        requirePermissions: { blog: 3 },
+                        requireUser: '{{nickname}}',
+                    },
+                    button: {
+                        icon: 'plus',
+                        type: 'primary',
+                        href: '/blog-creation',
+                    },
+                },
+            ],
             tableKey: 'blogTable',
             showSelection: true,
-            form,
             scroll,
             columns,
         };

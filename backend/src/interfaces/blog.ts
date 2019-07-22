@@ -3,14 +3,15 @@ export interface IBlogData {
     description: string;
     title: string;
     authors: number[];
-    comments: any[];
+    comments: number[];
+    scanNumber: number;
     tags: number[];
     categories: number[];
 }
 
 export interface IBlog extends IBlogData {
     id: number;
-    published: boolean;
+    published: number;
     createdAt: string;
     updatedAt: string;
     createdBy: string;

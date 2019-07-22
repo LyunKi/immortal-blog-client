@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import { useCheckStatus } from '@hooks';
 import { IAuthChecker } from '@interfaces';
 import { DEFAULT_FORBIDDEN } from '@configs';
@@ -13,13 +13,13 @@ const Auth = ({
     fallback,
     render,
 }: IProps) => {
-    const status = useCheckStatus(
+    const status = useCheckStatus({
         forbiddenRoles,
         requireRoles,
         requirePermissions,
-    );
+    });
     if (status === '403' || status === '401') {
-        return fallback ? fallback : <></>;
+        return fallback || null;
     } else {
         return render;
     }

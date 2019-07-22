@@ -5,7 +5,7 @@ import { IAuthChecker, IKeyMap } from '@interfaces';
 import { SelectProps } from 'antd/lib/select';
 import { useFetch } from '@hooks';
 import { api } from '@utils';
-import { map } from 'lodash';
+import { map, toString, isNumber, isArray } from 'lodash';
 
 const Option = Select.Option;
 interface IApiFetch {
@@ -18,6 +18,7 @@ interface ICommonFetch {
 interface ISelectProps extends SelectProps {
     auth?: IAuthChecker;
     options?: IKeyMap[];
+    lazy?: boolean;
 }
 
 type ApiProps = IApiFetch & ISelectProps;
@@ -31,11 +32,22 @@ const ImmortalSelect = (props: IProps, ref: any) => {
     const fetchOptions = apiPath && api.get.bind(null, apiPath);
     const getOptions = (props as CommonProps).getOptions || fetchOptions;
     const { data: options } = useFetch(initialOptions, getOptions);
+    let value = props.value;
+    if (isNumber(value)) {
+        value = toString(value);
+    } else if (isArray(value)) {
+        value = map(value, toString);
+    }
     return (
         <Auth
             {...props.auth}
             render={
-                <Select optionFilterProp={'children'} ref={ref} {...props}>
+                <Select
+                    optionFilterProp={'children'}
+                    ref={ref}
+                    {...props}
+                    value={value}
+                >
                     {map(options, option => (
                         <Option key={option.id} value={option.id}>
                             {option.name}

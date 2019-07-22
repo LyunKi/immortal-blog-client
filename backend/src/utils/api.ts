@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_SERVER, Immortal, METHOD } from '@configs';
+import { API_SERVER, Immortal, METHOD, SERVER } from '@configs';
 import { IApi, IApiRequestOptions, IObject, IResponse } from '@interfaces';
 import { each, set } from 'lodash';
 import {
@@ -29,12 +29,14 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use(config => {
-    config.paramsSerializer = params => {
-        return qs.stringify(humps.decamelizeKeys(params), {
-            arrayFormat: 'indices',
-            encode: false,
-        });
-    };
+    if (config.url !== '/upload') {
+        config.paramsSerializer = params => {
+            return qs.stringify(humps.decamelizeKeys(params), {
+                arrayFormat: 'indices',
+                encode: false,
+            });
+        };
+    }
     return config;
 });
 
@@ -103,6 +105,28 @@ const api: IApi = {
                 return Promise.resolve(response.data);
             });
     },
+};
+
+// @ts-ignore
+api.upload = function(files: FileList, config) {
+    const formData = new FormData();
+    each(files, file => {
+        formData.append('files[]', file);
+    });
+    return api.request<string[]>({
+        ...config,
+        method: 'post',
+        data: formData,
+        url: '/upload',
+        baseURL: SERVER,
+        transformRequest: [
+            //@ts-ignore
+            ...axios.defaults.transformRequest,
+        ],
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
 };
 
 function produceMethod<T>(method: string) {

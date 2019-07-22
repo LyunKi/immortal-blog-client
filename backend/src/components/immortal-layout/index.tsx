@@ -1,4 +1,13 @@
-import { Avatar, Breadcrumb, Icon, Layout, Menu } from 'antd';
+import {
+    Avatar,
+    Badge,
+    Breadcrumb,
+    Card,
+    Dropdown,
+    Icon,
+    Layout,
+    Menu,
+} from 'antd';
 import React, { ReactChild, useCallback, useMemo } from 'react';
 import './index.scss';
 import { useStore } from '@hooks';
@@ -6,8 +15,8 @@ import { observer } from 'mobx-react-lite';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { Logo } from '@components';
-import { generateIcons } from '@utils';
-import { get, map, filter } from 'lodash';
+import { generateIcons, stopPropagation } from '@utils';
+import { filter, get, map } from 'lodash';
 import { IObject } from '@interfaces';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -145,7 +154,7 @@ const ImmortalLayout = observer(({ children, location }: IProps) => {
                     {
                         key: 'blog-creation',
                         name: 'Blog Creation',
-                        link: '/blogs/creation',
+                        link: '/blog-creation',
                         icon: {
                             type: 'type',
                             value: 'file-add',
@@ -154,26 +163,16 @@ const ImmortalLayout = observer(({ children, location }: IProps) => {
                 ],
             },
             {
-                key: 'user-page',
-                name: 'User Page',
+                key: 'user-center',
+                name: 'User Center',
+                link: `/user-center`,
                 icon: {
                     type: 'type',
                     value: 'user',
                 },
-                children: [
-                    {
-                        key: 'user-center',
-                        name: 'User Center',
-                        link: `/user-center/${nickname}`,
-                        icon: {
-                            type: 'type',
-                            value: 'pic-left',
-                        },
-                    },
-                ],
             },
         ];
-    }, [nickname]);
+    }, []);
     const avatar = get(user, 'userInfo.avatar');
     const avatarProps = avatar
         ? {
@@ -182,7 +181,7 @@ const ImmortalLayout = observer(({ children, location }: IProps) => {
               className: 'avatar img',
           }
         : {
-              children: nickname,
+              icon: 'user',
               className: 'avatar string',
           };
     const onCollapse = useCallback(
@@ -192,6 +191,53 @@ const ImmortalLayout = observer(({ children, location }: IProps) => {
         [common],
     );
     const mainLayout = classnames('main', common.marginMenu);
+    const logout = useCallback(
+        event => {
+            user.logout(event);
+        },
+        [user],
+    );
+    const rightMenu = useMemo(() => {
+        return (
+            <Menu>
+                <Menu.Item key='0'>
+                    <Link to={'/user-center'}>
+                        <Icon type={'user'} /> User Center
+                    </Link>
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item key='1'>
+                    <span onClick={logout}>
+                        <Icon type={'logout'} /> Logout
+                    </span>
+                </Menu.Item>
+            </Menu>
+        );
+    }, [logout]);
+    const bellMenu = useMemo(() => {
+        const tabListNoTitle = [
+            {
+                key: 'notification',
+                tab: 'Notification(2)',
+            },
+            {
+                key: 'message',
+                tab: 'Message(3)',
+            },
+        ];
+        return (
+            <div onClick={stopPropagation}>
+                <Card
+                    className={'notification-card'}
+                    onClick={stopPropagation}
+                    size={'small'}
+                    tabList={tabListNoTitle}
+                >
+                    <span>content1</span>
+                </Card>
+            </div>
+        );
+    }, []);
     return (
         <Layout className={'immortal-layout'}>
             <Sider
@@ -220,7 +266,24 @@ const ImmortalLayout = observer(({ children, location }: IProps) => {
                         <Breadcrumb>{breadcrumbItems}</Breadcrumb>
                     </div>
                     <div className={'header-right'}>
-                        <Avatar {...avatarProps} />
+                        {
+                            <Dropdown overlay={bellMenu} trigger={['click']}>
+                                <div className={'operation'}>
+                                    <Badge count={5}>
+                                        <Icon
+                                            type={'bell'}
+                                            className={'notification'}
+                                        />
+                                    </Badge>
+                                </div>
+                            </Dropdown>
+                        }
+                        <Dropdown overlay={rightMenu}>
+                            <div className={'operation'}>
+                                <Avatar {...avatarProps} />
+                                <span className={'nickname'}>{nickname}</span>
+                            </div>
+                        </Dropdown>
                     </div>
                 </Header>
                 <Content className={'content'}>

@@ -101,9 +101,9 @@ const UserFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.users)(
                                     optionFilterProp={'children'}
                                     allowClear
                                 >
-                                    <Option value={0}>male</Option>
-                                    <Option value={1}>female</Option>
-                                    <Option value={2}>unknown gender</Option>
+                                    <Option value={0}>Male</Option>
+                                    <Option value={1}>Female</Option>
+                                    <Option value={2}>Unknown Gender</Option>
                                 </Select>,
                             )}
                         </Item>

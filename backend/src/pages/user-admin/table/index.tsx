@@ -1,16 +1,22 @@
 import { store } from '@stores';
-import { Association, IColumnProps, ImmortalTable } from '@components';
+import {
+    Activated,
+    Association,
+    IColumnProps,
+    ImmortalTable,
+} from '@components';
 import { IKeyMap, IUser } from '@interfaces';
 import moment from 'moment';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { useFetch } from '@hooks';
+import { useFetch, useStore } from '@hooks';
 import { filter, map } from 'lodash';
 import './index.scss';
 import { API_PATH } from '@configs';
 import { ApiAction } from '@apis';
 import { Avatar, Badge, Tag } from 'antd';
 import { BadgeProps } from 'antd/lib/badge';
+import { Navigator } from '@utils';
 
 const TABLE_KEY = 'userTable';
 const TABLE_FORM_KEY = 'userTableForm';
@@ -22,6 +28,10 @@ store.createTableStore(TABLE_KEY, API_PATH.users, TABLE_FORM_KEY, {
     },
 });
 const UserTable = observer(() => {
+    const {
+        user,
+        tables: { userTable },
+    } = useStore(['user', 'tables']);
     const columns: IColumnProps<IUser>[] = [
         {
             title: 'avatar',
@@ -36,7 +46,7 @@ const UserTable = observer(() => {
                           className: 'avatar img',
                       }
                     : {
-                          children: record.nickname,
+                          icon: 'user',
                           className: 'avatar string',
                       };
                 return <Avatar {...avatarProps} />;
@@ -88,10 +98,7 @@ const UserTable = observer(() => {
             title: 'activated',
             dataIndex: 'activated',
             render: value => {
-                const status: BadgeProps = value
-                    ? { status: 'success', text: 'activated' }
-                    : { status: 'default', text: 'inactivated' };
-                return <Badge {...status} />;
+                return <Activated activated={value} />;
             },
         },
         {
@@ -133,20 +140,15 @@ const UserTable = observer(() => {
         },
         {
             key: 'action',
-            width: 210,
+            width: 100,
             actions: [
-                {
-                    button: {
-                        text: 'detail',
-                        type: 'link',
-                        href: '/user-center/{{nickname}}',
-                    },
-                },
                 {
                     button: {
                         text: 'settings',
                         type: 'link',
-                        href: '/user-settings/{{nickname}}',
+                    },
+                    action: (_: any, record) => {
+                        Navigator.goto('/users/' + record.nickname);
                     },
                 },
             ],
@@ -161,6 +163,26 @@ const UserTable = observer(() => {
         showSelection: true,
         scroll,
         columns,
+        operations: [
+            {
+                auth: {
+                    requireRoles: ['immortal'],
+                },
+                button: {
+                    type: 'batch',
+                    icon: 'lock',
+                    tip: {
+                        title: 'Forbid',
+                    },
+                    className: 'operation create-button',
+                },
+                action: () => {
+                    user.forbid(userTable.selectedRowKeys).then(
+                        userTable.fetchData.bind(userTable),
+                    );
+                },
+            },
+        ],
     };
     return (
         <div className={'user-table'}>

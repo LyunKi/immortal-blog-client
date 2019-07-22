@@ -1,7 +1,7 @@
 import { RootStore } from '@stores';
 import { action, observable } from 'mobx';
 import { IFunction, IObject } from '@interfaces';
-import { each } from 'lodash';
+import { each, set as lodashSet } from 'lodash';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import { api } from '@utils';
 
@@ -27,6 +27,12 @@ export class FormStore {
         });
     }
 
+    @action initFields(fields: IObject) {
+        each(fields, (field, key) => {
+            lodashSet(this.fields, `${key}.value`, field);
+        });
+    }
+
     @action onValuesChange(values: IObject) {
         each(values, (value, key) => {
             this.fields[key] = {
@@ -41,23 +47,23 @@ export class FormStore {
         failAction?: IFunction,
         borrowValue?: IFunction,
     ) {
-        if (!this.form) {
-            throw new Error('it should not happened');
-        }
-        this.form.validateFields((err, value) => {
-            if (err) {
-                return;
-            }
-            this.showLoading();
-            const transformedValue = borrowValue ? borrowValue(value) : value;
-            api.post<T>(this.apiPath, {
-                ...transformedValue,
-                id: undefined,
-            })
-                .then(successAction)
-                .catch(failAction)
-                .finally(this.hideLoading);
-        });
+        this.form &&
+            this.form.validateFields((err, value) => {
+                if (err) {
+                    return;
+                }
+                this.showLoading();
+                const transformedValue = borrowValue
+                    ? borrowValue(value)
+                    : value;
+                api.post<T>(this.apiPath, {
+                    ...transformedValue,
+                    id: undefined,
+                })
+                    .then(successAction)
+                    .catch(failAction)
+                    .finally(this.hideLoading);
+            });
     }
 
     @action put<T>(
@@ -65,20 +71,20 @@ export class FormStore {
         failAction?: IFunction,
         borrowValue?: IFunction,
     ) {
-        if (!this.form) {
-            throw new Error('it should not happened');
-        }
-        this.form.validateFields((err, value) => {
-            if (err) {
-                return;
-            }
-            this.showLoading();
-            const transformedValue = borrowValue ? borrowValue(value) : value;
-            api.put<T>(`${this.apiPath}/:id`, transformedValue)
-                .then(successAction)
-                .catch(failAction)
-                .finally(this.hideLoading);
-        });
+        this.form &&
+            this.form.validateFields((err, value) => {
+                if (err) {
+                    return;
+                }
+                this.showLoading();
+                const transformedValue = borrowValue
+                    ? borrowValue(value)
+                    : value;
+                api.put<T>(`${this.apiPath}/:id`, transformedValue)
+                    .then(successAction)
+                    .catch(failAction)
+                    .finally(this.hideLoading);
+            });
     }
 
     resetFields() {

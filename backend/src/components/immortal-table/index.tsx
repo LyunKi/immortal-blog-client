@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Divider, message, Table } from 'antd';
+import { Button, Divider, message, Table } from 'antd';
 import { each, get, isEmpty, map, uniqueId } from 'lodash';
 import { ColumnProps, TableProps } from 'antd/lib/table';
 import { useStore } from '@hooks';
@@ -10,7 +10,7 @@ import { WrappedFormUtils } from 'antd/lib/form/Form';
 import classnames from 'classnames';
 import { IAuthChecker, IButtonProps, IFunction } from '@interfaces';
 import { ImmortalButton } from '@components';
-import { ButtonType } from 'antd/lib/button';
+import { ButtonProps, ButtonType } from 'antd/lib/button';
 import { interpolate } from '@utils';
 
 const ACTION_CONFIG: ColumnProps<any> = {
@@ -37,11 +37,14 @@ export interface IColumnProps<T> extends ColumnProps<T> {
     actions?: IButtonProps[];
 }
 
+interface IOperation extends IButtonProps {
+    type?: 'batch' | 'normal';
+}
 export interface ITableProps<T> extends TableProps<T> {
     creatable?: IAuthChecker;
     modifiable?: IAuthChecker;
     deletable?: IAuthChecker;
-    operations?: IButtonProps[];
+    operations?: IOperation[];
     batchDeletable?: IAuthChecker;
     tableKey: string;
     columns: IColumnProps<T>[];
@@ -178,14 +181,19 @@ function renderActionColumn<T>(
                         );
                     }
                     if (actionProps.auth) {
+                        if (actionProps.auth.requireUser) {
+                            actionProps.auth.requireUser = interpolate(
+                                actionProps.auth.requireUser,
+                                record,
+                            );
+                        }
+                        const button: ButtonProps = {
+                            disabled: true,
+                            type: 'link',
+                            className: 'no-auth table-action disabled',
+                        };
                         actionProps.auth.fallback = (
-                            <ImmortalButton
-                                button={{
-                                    text: 'Forbidden',
-                                    type: 'link',
-                                    className: 'no-auth table-action disabled',
-                                }}
-                            />
+                            <Button {...button}>forbidden</Button>
                         );
                     }
                     actionProps.button.className = classnames(
@@ -304,9 +312,6 @@ function Inner<T>(props: ITableProps<T>) {
     }, [props.creatable, table.datasource, table.data]);
     //transform props
     const transformProps = {
-        locale: {
-            emptyText: '--',
-        },
         ...props,
         columns,
         rowSelection,
@@ -370,7 +375,15 @@ function Inner<T>(props: ITableProps<T>) {
                     />
                 )}
                 {map(operations, (operation, index) => {
-                    operation.button.loading = operationLoading;
+                    if (operation.type === 'batch') {
+                        operation.button.loading =
+                            operationLoading && !isEmptySelected;
+                        operation.disabled =
+                            table.isChanging || isEmptySelected;
+                    } else {
+                        operation.button.loading = operationLoading;
+                        operation.disabled = table.isChanging;
+                    }
                     return <ImmortalButton key={index} {...operation} />;
                 })}
                 {props.batchDeletable && (

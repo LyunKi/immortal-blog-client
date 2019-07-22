@@ -41,7 +41,26 @@
             align-items: center;
             justify-content: space-between;
             .header-right {
-                text-align: right;
+                display: inline-flex;
+                align-items: center;
+                .notification {
+                    font-size: $font-size-big;
+                }
+                .operation {
+                    &:hover {
+                        cursor: pointer;
+                        background: rgba(0, 0, 0, 0.025);
+                    }
+                    display: inline-flex;
+                    align-items: center;
+                    margin-left: 16px;
+                    text-align: right;
+                    height: 64px;
+                    padding: 0 8px;
+                    .nickname {
+                        margin-left: 8px;
+                    }
+                }
             }
             .string {
                 background: $black-color;
@@ -58,5 +77,11 @@
         .footer {
             text-align: center;
         }
+    }
+}
+.notification-card {
+    .ant-tabs .ant-tabs-tab {
+        font-size: 0.8em;
+        padding: 12px;
     }
 }

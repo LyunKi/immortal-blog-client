@@ -80,7 +80,7 @@ const CategoryFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.categories)(
                                 <Input placeholder={'Search create user'} />,
                             )}
                         </Item>
-                    </Col>{' '}
+                    </Col>
                     <Col span={8}>
                         <Item label={'Created At'}>
                             {getFieldDecorator('createdAt')(

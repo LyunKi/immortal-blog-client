@@ -8,11 +8,13 @@ import React, { ComponentType } from 'react';
 export function createLazyForm<T extends ComponentType<any>>(
     formKey: string,
     apiPath: string,
+    initialFields?: IObject,
 ) {
     const store = getStore();
     store.createFormStore(formKey, apiPath);
+    initialFields && store.forms[formKey].initFields(initialFields);
     const formStore = store.forms[formKey];
-    return (Form: T) => () => {
+    return (Form: T) => (props: any) => {
         const EnhancedForm = AntForm.create({
             mapPropsToFields() {
                 let formFields: IObject = {};
@@ -30,7 +32,7 @@ export function createLazyForm<T extends ComponentType<any>>(
         })(Form);
         return (
             //@ts-ignore
-            <EnhancedForm ref={ins => (formStore.form = ins)} />
+            <EnhancedForm {...props} ref={ins => (formStore.form = ins)} />
         );
     };
 }

@@ -78,9 +78,9 @@ const RegisterForm = createLazyForm(FORM_KEY, API_PATH.register)(
                             placeholder='User Gender'
                             showSearch
                         >
-                            <Option value={0}>male</Option>
-                            <Option value={1}>female</Option>
-                            <Option value={2}>unknown gender</Option>
+                            <Option value={0}>Male</Option>
+                            <Option value={1}>Female</Option>
+                            <Option value={2}>Unknown Gender</Option>
                         </Select>,
                     )}
                 </Item>

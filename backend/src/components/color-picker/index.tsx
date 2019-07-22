@@ -12,7 +12,7 @@ interface IProps {
 }
 
 const ColorPicker = ({ value, onChange, disabled }: IProps, ref: any) => {
-    const [showPicker, setShown] = useState(false);
+    const [showPicker, setShown] = useState(!disabled);
     const togglePicker = useCallback(() => {
         !disabled && setShown(!showPicker);
     }, [showPicker, disabled, setShown]);

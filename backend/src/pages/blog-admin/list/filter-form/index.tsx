@@ -1,16 +1,27 @@
 import { createLazyForm, formatTimeRange } from '@utils';
 import { observer } from 'mobx-react-lite';
-import { Button, Col, DatePicker, Form, Input, Row, Tooltip } from 'antd';
+import {
+    Button,
+    Col,
+    DatePicker,
+    Form,
+    Input,
+    Row,
+    Select,
+    Tooltip,
+} from 'antd';
 import React, { useCallback } from 'react';
 import { FormComponentProps, FormProps } from 'antd/lib/form';
 import moment from 'moment';
 import './index.scss';
 import { useStore } from '@hooks';
 import { API_PATH } from '@configs';
+import { ImmortalSelect } from '@components';
 
 const FILTER_FORM_KEY = 'blogFilterForm';
 
 const Item = Form.Item;
+const Option = Select.Option;
 const RangePicker = DatePicker.RangePicker;
 
 const BlogFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
@@ -77,29 +88,66 @@ const BlogFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
                         </Item>
                     </Col>
                     <Col span={8}>
-                        <Item label={'Authors'}>
-                            {getFieldDecorator('authors')(
-                                <Input placeholder={'Search authors'} />,
+                        <Item label={'Tags'}>
+                            {getFieldDecorator('tags')(
+                                <ImmortalSelect
+                                    apiPath={API_PATH.tag_options}
+                                    placeholder='Search Tags'
+                                    mode={'multiple'}
+                                    allowClear
+                                />,
                             )}
                         </Item>
                     </Col>
                     <Col span={8}>
-                        <Item label={'Created At'}>
-                            {getFieldDecorator('createdAt')(
-                                <RangePicker
-                                    style={{ width: '100%' }}
-                                    ranges={{
-                                        Today: [
-                                            moment().startOf('day'),
-                                            moment().endOf('day'),
-                                        ],
-                                        'This Month': [
-                                            moment().startOf('month'),
-                                            moment().endOf('month'),
-                                        ],
-                                    }}
-                                    showTime
+                        <Item label={'Categories'}>
+                            {getFieldDecorator('categories')(
+                                <ImmortalSelect
+                                    apiPath={API_PATH.category_options}
+                                    placeholder='Search Categories'
+                                    mode={'multiple'}
+                                    allowClear
                                 />,
+                            )}
+                        </Item>
+                    </Col>
+                    <Col span={8}>
+                        <Item label={'Authors'}>
+                            {getFieldDecorator('authors')(
+                                <ImmortalSelect
+                                    apiPath={API_PATH.author_options}
+                                    placeholder='Authors'
+                                    mode={'multiple'}
+                                    allowClear
+                                />,
+                            )}
+                        </Item>
+                    </Col>
+                    <Col span={8}>
+                        <Item label={'Published'}>
+                            {getFieldDecorator('published')(
+                                <Select
+                                    optionFilterProp={'children'}
+                                    placeholder='Search published'
+                                    allowClear
+                                >
+                                    <Option value={1}>unpublished</Option>
+                                    <Option value={2}>published</Option>
+                                </Select>,
+                            )}
+                        </Item>
+                    </Col>
+                    <Col span={8}>
+                        <Item label={'Created By'}>
+                            {getFieldDecorator('createdBy')(
+                                <Input placeholder={'Search create user'} />,
+                            )}
+                        </Item>
+                    </Col>
+                    <Col span={8}>
+                        <Item label={'Updated By'}>
+                            {getFieldDecorator('updatedBy')(
+                                <Input placeholder={'Search updated user'} />,
                             )}
                         </Item>
                     </Col>
@@ -123,7 +171,7 @@ const BlogFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.login)(
                             )}
                         </Item>
                     </Col>
-                    <Col offset={8} span={8}>
+                    <Col span={8}>
                         <Item
                             label={' '}
                             colon={false}

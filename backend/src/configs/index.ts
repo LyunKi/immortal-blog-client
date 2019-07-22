@@ -1,4 +1,5 @@
 const API_SERVER = '//localhost:8083/api';
+const SERVER = '//localhost:8083';
 
 const SUCCESS = 200;
 const UNKNOWN_ERROR = 500;
@@ -30,13 +31,19 @@ const API_PATH = {
     register: '/register',
     tags: '/tags',
     users: '/users',
-    role_options: '/role_options',
+    user_settings: '/users/settings',
+    users_activated: '/users/activated',
+    role_options: '/roles/options',
+    author_options: '/users/options',
+    category_options: '/categories/options',
+    tag_options: '/tags/options',
     categories: '/categories',
     blogs: '/blogs',
 };
 
 export {
     API_SERVER,
+    SERVER,
     SUCCESS,
     Immortal,
     METHOD,

@@ -1,16 +1,16 @@
-import { IAuthStatus, IPermissions, IRoles } from '@interfaces';
-import { get, intersection, isEmpty, some } from 'lodash';
+import { IAuthChecker, IAuthStatus } from '@interfaces';
+import { get, intersection, isEmpty, some, trim } from 'lodash';
 import { useDebounce, useStore } from '@hooks';
 import { useMemo } from 'react';
 import { ApiAction } from '@apis';
 
-export const useCheckStatus = (
-    forbiddenRoles: IRoles,
-    requireRoles: IRoles,
-    requirePermissions: IPermissions,
-    notFound?: boolean,
-    requireUser: string | false = false,
-): IAuthStatus => {
+export const useCheckStatus = ({
+    forbiddenRoles = [],
+    requireRoles,
+    requirePermissions,
+    notFound,
+    requireUser,
+}: IAuthChecker): IAuthStatus => {
     const { user } = useStore(['user']);
     return useMemo(() => {
         //Firstly , authorized?
@@ -18,7 +18,7 @@ export const useCheckStatus = (
             return '401';
         }
         //Secondly, path can be found?
-        if (!!notFound) {
+        if (notFound) {
             return '404';
         }
         //Thirdly , forbidden?
@@ -67,16 +67,25 @@ export const useConfirmSamePassword = (password: string) => {
     );
 };
 
-export const useCheckRepeatedName = () => {
-    return useDebounce((_, value, callback) => {
-        ApiAction.checkIsRepeated({
-            nickname: value,
-        }).then(isRepeated => {
-            if (isRepeated) {
-                callback('This nickname already exists');
-            } else {
+export const useCheckRepeatedName = (initialName?: string) => {
+    return useDebounce(
+        (_, value, callback) => {
+            if (isEmpty(value) || trim(value) === initialName) {
                 callback();
+                return;
             }
-        });
-    }, []);
+            ApiAction.checkIsRepeated({
+                nickname: value,
+            })
+                .then(isRepeated => {
+                    if (isRepeated) {
+                        callback('This nickname already exists');
+                    } else {
+                        callback();
+                    }
+                })
+                .catch(() => callback());
+        },
+        [initialName],
+    );
 };

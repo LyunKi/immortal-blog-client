@@ -6,6 +6,7 @@ import { ILoginResponse, IObject, IPrivileges, IUserInfo } from '@interfaces';
 import { get } from 'lodash';
 import { FormEvent } from 'react';
 import { API_PATH } from '@configs';
+import { ApiAction } from '@apis';
 
 export class UserStore {
     private rootStore: RootStore;
@@ -43,6 +44,29 @@ export class UserStore {
                 message.error(`Login fail,caused by: ${error.message}`);
             },
         );
+    }
+
+    @action logout(event: FormEvent) {
+        event.preventDefault();
+        Storage.removeItem('token');
+        Storage.removeItem('user');
+        this.userInfo = undefined;
+        this.privileges = undefined;
+        Navigator.goto('/auth/login');
+    }
+
+    @action forbid(ids: number[] | string[]) {
+        return ApiAction.forbidUsers(ids).then(num => {
+            message.success(`Succeed to forbid ${num} users`);
+        });
+    }
+
+    @action getSettings(nickname?: string) {
+        const queryUser = nickname || get(this.userInfo, 'nickname');
+        if (!queryUser) {
+            throw new Error('Unknown user');
+        }
+        return ApiAction.getSettings(queryUser);
     }
 
     @action register(event: FormEvent) {

@@ -6,4 +6,6 @@ export { default as Auth } from './auth';
 export { default as ImmortalButton } from './immortal-button';
 export { default as ImmortalSelect } from './immortal-select';
 export { default as Association } from './association';
+export { default as ImmortalAvatar } from './immortal-avatar';
+export { default as Activated } from './activated';
 export * from './immortal-table';
