@@ -2,13 +2,15 @@ import {
     Avatar,
     Badge,
     Breadcrumb,
+    Button,
     Card,
     Dropdown,
     Icon,
     Layout,
+    List,
     Menu,
 } from 'antd';
-import React, { ReactChild, useCallback, useMemo } from 'react';
+import React, { ReactChild, useCallback, useEffect, useMemo } from 'react';
 import './index.scss';
 import { useStore } from '@hooks';
 import { observer } from 'mobx-react-lite';
@@ -17,10 +19,13 @@ import classnames from 'classnames';
 import { Logo } from '@components';
 import { generateIcons, stopPropagation } from '@utils';
 import { filter, get, map } from 'lodash';
-import { IObject } from '@interfaces';
+import { IFunction, IMessage, IObject } from '@interfaces';
+import moment from 'moment';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu, Item } = Menu;
+const ListItem = List.Item;
+const ListItemMeta = List.Item.Meta;
 
 interface IProps {
     children: ReactChild;
@@ -83,7 +88,116 @@ const renderSubMenu = (menu: ISubMenu) => (
     </SubMenu>
 );
 
+const LoadMore = observer(() => {
+    const { common } = useStore(['common']);
+    const loadMore = useCallback(common.loadMore.bind(common), [common]);
+    return (
+        <Button onClick={loadMore} disabled={!common.canLoadMore} type={'link'}>
+            Load More
+        </Button>
+    );
+});
+
+const ClearAll = observer(() => {
+    const { common } = useStore(['common']);
+    const clearAll = useCallback(common.clearAll.bind(common), [common]);
+    return (
+        <Button onClick={clearAll} disabled={!common.canClearAll} type={'link'}>
+            Clear All
+        </Button>
+    );
+});
+
+const MessageItem = ({ item }: { item: IMessage }) => {
+    const avatar = item.img && <Avatar src={item.img} />;
+    const title = item.href ? (
+        <Link to={item.href}>{item.title}</Link>
+    ) : (
+        item.title
+    );
+    const fromNow = moment(item.createAt).fromNow();
+    return (
+        <ListItem className={'message'}>
+            <ListItemMeta
+                avatar={avatar}
+                title={title}
+                description={
+                    <div className={'description'}>
+                        <div className={'content'}>{item.content}</div>
+                        <div className={'from-now'}>{fromNow}</div>
+                    </div>
+                }
+            />
+        </ListItem>
+    );
+};
+
+interface IBellMenuProps {
+    notifications: IMessage[];
+    messages: IMessage[];
+}
+
+const BellMenu = observer(({ notifications, messages }: IBellMenuProps) => {
+    const tabListNoTitle = [
+        {
+            key: 'notifications',
+            tab: `Notifications(${notifications.length})`,
+        },
+        {
+            key: 'messages',
+            tab: `Messages(${messages.length})`,
+        },
+    ];
+    const { common } = useStore(['common']);
+    return (
+        <div onClick={stopPropagation}>
+            <Card
+                className={'notification-card'}
+                onClick={stopPropagation}
+                size={'small'}
+                activeTabKey={common.showMessageKey}
+                onTabChange={common.onMessageKeyChange.bind(common)}
+                tabList={tabListNoTitle}
+                actions={[<LoadMore />, <ClearAll />]}
+            >
+                {
+                    <List
+                        className='message-list'
+                        itemLayout='horizontal'
+                        loadMore={true}
+                        dataSource={common.datasource}
+                        renderItem={item => <MessageItem item={item} />}
+                    />
+                }
+            </Card>
+        </div>
+    );
+});
+
+interface IRightMenuProps {
+    logout: IFunction;
+}
+
+const RightMenu = ({ logout }: IRightMenuProps) => {
+    return (
+        <Menu className={'user-action'}>
+            <Menu.Item key='0'>
+                <Link to={'/user-center'}>
+                    <Icon type={'user'} /> User Center
+                </Link>
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item key='1'>
+                <span onClick={logout}>
+                    <Icon type={'logout'} /> Logout
+                </span>
+            </Menu.Item>
+        </Menu>
+    );
+};
+
 const ImmortalLayout = observer(({ children, location }: IProps) => {
+    //Create breadcrumb
     const pathSnippets = filter(location.pathname.split('/'), (i: any) => i);
     const extraBreadcrumbItems = map(
         pathSnippets,
@@ -103,7 +217,14 @@ const ImmortalLayout = observer(({ children, location }: IProps) => {
             </Link>
         </Breadcrumb.Item>,
     ].concat(extraBreadcrumbItems);
+
     const { common, user } = useStore(['common', 'user']);
+    //Create websocket with server
+    useEffect(() => {
+        common.initConnection();
+        return common.disconnect.bind(common);
+    }, [common]);
+    const { collapsed, messages, notifications } = common;
     const nickname = get(user, 'userInfo.nickname');
     const menus: MultiMenu[] = useMemo(() => {
         return [
@@ -197,59 +318,18 @@ const ImmortalLayout = observer(({ children, location }: IProps) => {
         },
         [user],
     );
-    const rightMenu = useMemo(() => {
-        return (
-            <Menu>
-                <Menu.Item key='0'>
-                    <Link to={'/user-center'}>
-                        <Icon type={'user'} /> User Center
-                    </Link>
-                </Menu.Item>
-                <Menu.Divider />
-                <Menu.Item key='1'>
-                    <span onClick={logout}>
-                        <Icon type={'logout'} /> Logout
-                    </span>
-                </Menu.Item>
-            </Menu>
-        );
-    }, [logout]);
-    const bellMenu = useMemo(() => {
-        const tabListNoTitle = [
-            {
-                key: 'notification',
-                tab: 'Notification(2)',
-            },
-            {
-                key: 'message',
-                tab: 'Message(3)',
-            },
-        ];
-        return (
-            <div onClick={stopPropagation}>
-                <Card
-                    className={'notification-card'}
-                    onClick={stopPropagation}
-                    size={'small'}
-                    tabList={tabListNoTitle}
-                >
-                    <span>content1</span>
-                </Card>
-            </div>
-        );
-    }, []);
     return (
         <Layout className={'immortal-layout'}>
             <Sider
                 breakpoint='lg'
                 collapsible
-                collapsed={common.collapsed}
+                collapsed={collapsed}
                 onCollapse={onCollapse}
                 className={'sider'}
             >
                 <Logo
                     className={classnames('menu-logo', {
-                        'hide-text': common.collapsed,
+                        'hide-text': collapsed,
                     })}
                 />
                 <Menu theme='dark' mode='inline'>
@@ -267,9 +347,17 @@ const ImmortalLayout = observer(({ children, location }: IProps) => {
                     </div>
                     <div className={'header-right'}>
                         {
-                            <Dropdown overlay={bellMenu} trigger={['click']}>
+                            <Dropdown
+                                overlay={
+                                    <BellMenu
+                                        messages={messages}
+                                        notifications={notifications}
+                                    />
+                                }
+                                trigger={['click']}
+                            >
                                 <div className={'operation'}>
-                                    <Badge count={5}>
+                                    <Badge count={common.totalNum}>
                                         <Icon
                                             type={'bell'}
                                             className={'notification'}
@@ -278,7 +366,7 @@ const ImmortalLayout = observer(({ children, location }: IProps) => {
                                 </div>
                             </Dropdown>
                         }
-                        <Dropdown overlay={rightMenu}>
+                        <Dropdown overlay={<RightMenu logout={logout} />}>
                             <div className={'operation'}>
                                 <Avatar {...avatarProps} />
                                 <span className={'nickname'}>{nickname}</span>

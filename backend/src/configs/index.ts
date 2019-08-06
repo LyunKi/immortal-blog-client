@@ -1,5 +1,6 @@
 const API_SERVER = '//localhost:8083/api';
 const SERVER = '//localhost:8083';
+const WS_SERVER = '//localhost:8083/ws';
 
 const SUCCESS = 200;
 const UNKNOWN_ERROR = 500;
@@ -50,4 +51,5 @@ export {
     ISO_FORMAT,
     DEFAULT_FORBIDDEN,
     API_PATH,
+    WS_SERVER,
 };

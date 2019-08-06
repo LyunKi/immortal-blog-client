@@ -7,3 +7,4 @@ export * from './common';
 export * from './button';
 export * from './user';
 export * from './blog';
+export * from './message';

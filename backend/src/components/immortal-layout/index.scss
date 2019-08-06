@@ -79,9 +79,32 @@
         }
     }
 }
+
 .notification-card {
+    border-radius: 4px;
     .ant-tabs .ant-tabs-tab {
         font-size: 0.8em;
-        padding: 12px;
     }
+    .ant-card-body {
+        padding: 0;
+    }
+    .message-list {
+        width: 300px;
+        .message {
+            padding: 16px;
+            &:hover {
+                cursor: pointer;
+                background: #e6f7ff;
+            }
+            .from-now {
+                margin-top: 4px;
+                font-size: 0.8em;
+            }
+        }
+    }
+}
+
+.user-action {
+    border: 1px solid $border-color-base;
+    border-radius: 4px;
 }
