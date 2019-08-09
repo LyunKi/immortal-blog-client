@@ -1,13 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { IObject } from '@interfaces';
-import { Activated, ImmortalAvatar, ImmortalSelect } from '@components';
-import { get } from 'lodash';
+import { IObject, IUserInfoAndPrivileges } from '@interfaces';
+import {
+    Activated,
+    Auth,
+    ImmortalAvatar,
+    ImmortalButton,
+    ImmortalSelect,
+} from '@components';
+import { get, toInteger } from 'lodash';
 import { useCheckRepeatedName, useStore } from '@hooks';
-import { createLazyForm } from '@utils';
+import { createLazyForm, Navigator, refreshStorageInfo } from '@utils';
 import { observer } from 'mobx-react-lite';
 import { API_PATH } from '@configs';
-import { Form, Input, Radio } from 'antd';
+import { Form, Input, message, Radio } from 'antd';
 import { FormComponentProps, FormProps } from 'antd/lib/form';
+import './index.scss';
 
 const Item = Form.Item;
 
@@ -19,7 +26,10 @@ const UserSettings = createLazyForm('userModifyForm', API_PATH.user_settings)(
     observer((props: IProps) => {
         const { form, match } = props;
         const { getFieldDecorator, setFieldsValue } = form;
-        const { user } = useStore(['user']);
+        const {
+            user,
+            forms: { userModifyForm },
+        } = useStore(['user', 'forms']);
         const nickname = get(match, 'params.nickname');
         const [userSettings, setSettings] = useState({} as IObject);
         useEffect(() => {
@@ -29,7 +39,7 @@ const UserSettings = createLazyForm('userModifyForm', API_PATH.user_settings)(
                     email: settings.email,
                     phone: settings.phone,
                     sex: settings.sex,
-                    roles: settings.roles,
+                    role: settings.roles[0],
                     avatar: settings.avatar,
                 });
                 setSettings(settings);
@@ -50,10 +60,22 @@ const UserSettings = createLazyForm('userModifyForm', API_PATH.user_settings)(
             },
             [getFieldDecorator],
         );
-        const formProps: FormProps = {};
+        const formProps: FormProps = {
+            className: 'user-settings-form',
+            layout: 'horizontal',
+            labelCol: {
+                span: 8,
+            },
+            wrapperCol: {
+                span: 16,
+            },
+        };
         const checkRepeatedName = useCheckRepeatedName(userSettings.nickname);
         return (
             <Form {...formProps}>
+                <Item label='Avatar'>
+                    {getFieldDecorator('avatar')(<ImmortalAvatar />)}
+                </Item>
                 <Item label={'Nickname'}>
                     {getRequiredFieldDecorator('nickname', {
                         rules: [
@@ -79,11 +101,8 @@ const UserSettings = createLazyForm('userModifyForm', API_PATH.user_settings)(
                         ],
                     })(<Input type={'tel'} placeholder='Phone' />)}
                 </Item>
-                <Item label={'Avatar'}>
-                    {getFieldDecorator('avatar')(<ImmortalAvatar />)}
-                </Item>
                 <Item label='Gender'>
-                    {getFieldDecorator('sex')(
+                    {getRequiredFieldDecorator('sex')(
                         <Radio.Group>
                             <Radio value={0}>Male</Radio>
                             <Radio value={1}>Female</Radio>
@@ -91,21 +110,66 @@ const UserSettings = createLazyForm('userModifyForm', API_PATH.user_settings)(
                         </Radio.Group>,
                     )}
                 </Item>
+                <Auth
+                    render={
+                        <Item label={'Role'}>
+                            {getRequiredFieldDecorator('role')(
+                                <ImmortalSelect
+                                    apiPath={API_PATH.role_options}
+                                    placeholder='User Role'
+                                    allowClear
+                                />,
+                            )}
+                        </Item>
+                    }
+                    requireRoles={['immortal']}
+                />
                 <Item label='Status'>
                     <Activated
                         activated={activated}
                         showAction={{ activeUser: userId }}
                     />
                 </Item>
-                <Item label={'Roles'}>
-                    {getFieldDecorator('roles')(
-                        <ImmortalSelect
-                            apiPath={API_PATH.role_options}
-                            placeholder='User Roles'
-                            mode={'multiple'}
-                            allowClear
-                        />,
-                    )}
+                <Item
+                    label={' '}
+                    colon={false}
+                    className={'user-settings-operations'}
+                >
+                    <div className={'operations'}>
+                        <ImmortalButton
+                            button={{
+                                className: 'operation',
+                                text: 'Back',
+                            }}
+                            action={() => {
+                                Navigator.back();
+                            }}
+                        />
+                        <ImmortalButton
+                            button={{
+                                text: 'Confirm',
+                                type: 'primary',
+                                className: 'operation',
+                                loading: userModifyForm.loading,
+                            }}
+                            action={userModifyForm.put.bind(
+                                userModifyForm,
+                                (info: IUserInfoAndPrivileges) => {
+                                    refreshStorageInfo(info);
+                                    message.success(
+                                        'Update user settings successfully',
+                                    );
+                                    Navigator.back();
+                                },
+                                (err: IObject) => message.error(err.message),
+                                (value: IObject) => ({
+                                    ...value,
+                                    roles: [toInteger(value.role)],
+                                    id: userSettings.id,
+                                }),
+                            )}
+                        />
+                    </div>
                 </Item>
             </Form>
         );

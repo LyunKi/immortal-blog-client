@@ -1,6 +1,6 @@
 import { RootStore } from '@stores';
 import { action, computed, observable } from 'mobx';
-import { Storage } from '@utils';
+import { produceMessage, Storage } from '@utils';
 import { WS_SERVER } from '@configs';
 import { partition, take } from 'lodash';
 import { IMessage } from '@interfaces';
@@ -22,7 +22,11 @@ export class CommonStore {
     }
 
     @computed get canLoadMore(): boolean {
-        return this.showNum < this.datasource.length;
+        const source =
+            this.showMessageKey === 'messages'
+                ? this.messages
+                : this.notifications;
+        return this.showNum < source.length;
     }
 
     @computed get canClearAll(): boolean {
@@ -36,6 +40,7 @@ export class CommonStore {
                 : this.notifications;
         return take(source, this.showNum);
     }
+
     @computed get marginMenu() {
         return this.collapsed ? 'margin-collapsed-menu' : 'margin-menu';
     }
@@ -86,12 +91,23 @@ export class CommonStore {
         };
         this.connection.onmessage = event => {
             console.log(event);
+            const source = JSON.parse(event.data);
             const [messages, notifications] = partition(
-                JSON.parse(event.data),
-                message => message.type === 'message',
+                source,
+                message => message.message_type === 'message',
             );
             this.setMessages(messages);
             this.setNotifications(notifications);
+            if (Notification.permission === 'granted') {
+                produceMessage(source);
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    // if granted，send notification
+                    if (permission === 'granted') {
+                        produceMessage(source);
+                    }
+                });
+            }
         };
     }
 

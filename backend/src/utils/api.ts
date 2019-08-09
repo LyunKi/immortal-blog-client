@@ -48,6 +48,10 @@ const setTokenHeader = (token: string) => {
     );
 };
 
+const removeTokenHeader = () => {
+    set(instance, 'defaults.headers.common.Authorization', undefined);
+};
+
 //try to get the token from storage , and set into axios instance
 const token = Storage.getItem<string>('token');
 
@@ -154,4 +158,4 @@ each(Reflect.ownKeys(METHOD), method => {
     api[method] = produceMethod(method);
 });
 
-export { api, instance as apiInstance, setTokenHeader };
+export { api, instance as apiInstance, removeTokenHeader, setTokenHeader };

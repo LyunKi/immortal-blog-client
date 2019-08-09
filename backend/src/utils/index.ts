@@ -6,3 +6,5 @@ export * from './api';
 export * from './navigator';
 export * from './event';
 export * from './time';
+export * from './message';
+export * from './auth';

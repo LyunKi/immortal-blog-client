@@ -94,7 +94,13 @@ const UserFilterForm = createLazyForm(FILTER_FORM_KEY, API_PATH.users)(
                     </Col>
                     <Col span={8}>
                         <Item label={'User Gender'}>
-                            {getFieldDecorator('sex')(
+                            {getFieldDecorator('sex', {
+                                rules: [
+                                    {
+                                        required: true,
+                                    },
+                                ],
+                            })(
                                 <Select
                                     placeholder='User Gender'
                                     showSearch

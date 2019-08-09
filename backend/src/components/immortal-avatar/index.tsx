@@ -1,20 +1,12 @@
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
-import { Icon, message, Upload } from 'antd';
+import { Icon, Upload } from 'antd';
 import { IFunction, IObject } from '@interfaces';
-import { api } from '@utils';
+import { api, beforeUpload } from '@utils';
 import './index.scss';
 
 interface IProps {
     value?: string;
     onChange?: IFunction;
-}
-
-function beforeUpload(file: IObject) {
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-        message.error('Image must smaller than 2MB!');
-    }
-    return isLt2M;
 }
 
 const ImmortalAvatar = ({ value, onChange }: IProps, ref: any) => {

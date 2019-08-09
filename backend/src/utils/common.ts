@@ -1,4 +1,5 @@
 import { IObject } from '@interfaces';
+import { message } from 'antd';
 
 export function interpolate(
     text: string,
@@ -21,4 +22,12 @@ export function interpolate(
         result = result.replace(reg, value.toString().replace(/\//, '') || '');
     }
     return result;
+}
+
+export function beforeUpload(file: IObject) {
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+        message.error('Image must smaller than 2MB!');
+    }
+    return isLt2M;
 }

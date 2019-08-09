@@ -36,7 +36,7 @@ export const AuthRoute = observer((props: AuthProps) => {
     const computedMatch = get(rest, 'computedMatch');
     let requireUser: string | false = false;
     if (dynamicRequireSelf && get(computedMatch, 'params.username')) {
-        requireUser = computedMatch.params.userId;
+        requireUser = computedMatch.params.username;
     }
     const status = useCheckStatus({
         forbiddenRoles,

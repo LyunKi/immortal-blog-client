@@ -25,9 +25,9 @@ const Activated = ({ activated, showAction }: IProps) => {
         }
         setActivating(true);
         //@ts-ignore
-        ApiAction.activeUsers([showAction.activeUser])
+        ApiAction.sendActivatedMail(showAction.activeUser)
             .then(() => {
-                message.success('Active email has been sent to users email');
+                message.success("Active email has been sent to user's email");
             })
             .catch(setActivating.bind(null, false));
     }, [show, showAction, activating]);

@@ -77,7 +77,7 @@ const CategoryTableForm = createLazyForm(TABLE_FORM_KEY, API_PATH.categories)(
                                     categoryTable.cancelChange();
                                     categoryTable.fetchData();
                                 },
-                                undefined,
+                                err => message.error(err.message),
                                 value => ({
                                     ...value,
                                     id: form.getFieldValue('id'),

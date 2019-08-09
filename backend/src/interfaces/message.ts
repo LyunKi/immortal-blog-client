@@ -1,5 +1,5 @@
 export interface IMessage {
-    messageType: 'messages' | 'notifications';
+    message_type: 'messages' | 'notifications';
     title: string;
     content: string;
     href?: string;

@@ -1,4 +1,4 @@
-import { IKeyMap, IObject, IUser } from '@interfaces';
+import { IKeyMap, IObject, IUser, IUserInfoAndPrivileges } from '@interfaces';
 import { api } from '@utils';
 import { API_PATH } from '@configs';
 
@@ -31,7 +31,13 @@ export class ApiAction {
         return api.get<IKeyMap>(API_PATH.role_options);
     }
 
-    static activeUsers(ids: number[]) {
-        return api.post<IKeyMap>(API_PATH.users_activated, { ids });
+    static sendActivatedMail(id: number) {
+        return api.post<IKeyMap>(API_PATH.user_activated_email, { id });
+    }
+
+    static activeUser(token: string) {
+        return api.put<IUserInfoAndPrivileges>(API_PATH.user_activation, {
+            token,
+        });
     }
 }

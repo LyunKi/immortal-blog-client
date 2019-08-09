@@ -59,3 +59,5 @@ export interface IRole {
 
 export type IExceptionStatus = '404' | '403';
 export type IAuthStatus = '401' | '403' | '404' | '200';
+
+export type IUserInfoAndPrivileges = [IUserInfo, IPrivileges];

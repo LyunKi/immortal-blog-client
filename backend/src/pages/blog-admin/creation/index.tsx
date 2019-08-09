@@ -1,21 +1,28 @@
 import './index.scss';
 import { observer } from 'mobx-react-lite';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { get } from 'lodash';
-import { createLazyForm } from '@utils';
+import { api, beforeUpload, createLazyForm } from '@utils';
 import { API_PATH } from '@configs';
 import { FormComponentProps, FormProps } from 'antd/lib/form';
-import { Col, Form, Input, Row } from 'antd';
+import { Button, Col, Form, Icon, Input, Row, Upload } from 'antd';
 import { IObject } from '@interfaces';
 import { ImmortalSelect } from '@components';
-import { useCheckStatus } from '@hooks';
+import { useCheckStatus, useStore } from '@hooks';
+// @ts-ignore
+import { ContentUtils } from 'braft-utils';
+import BraftEditor, { ExtendControlType } from 'braft-editor';
+import 'braft-editor/dist/index.css';
 
 const Item = Form.Item;
 const TextArea = Input.TextArea;
 
 const BlogCreation = createLazyForm('blogCreateForm', API_PATH.blogs)(
     observer(({ form }: FormComponentProps) => {
-        const { getFieldDecorator } = form;
+        const { getFieldDecorator, setFieldsValue, getFieldValue } = form;
+        const {
+            forms: { blogCreateForm },
+        } = useStore(['forms']);
         // eslint-disable-next-line
         const status = useCheckStatus({
             requirePermissions: {
@@ -31,6 +38,44 @@ const BlogCreation = createLazyForm('blogCreateForm', API_PATH.blogs)(
             },
             [getFieldDecorator],
         );
+        const handleChange = useCallback(
+            info => {
+                if (info.file.status === 'uploading') {
+                    blogCreateForm.showLoading();
+                    return;
+                }
+                if (info.file.status === 'done') {
+                    const content = getFieldValue('content');
+                    setFieldsValue({
+                        content: ContentUtils.insertMedias(content, [
+                            {
+                                type: 'IMAGE',
+                                url: info.file.response[0],
+                            },
+                        ]),
+                    });
+                }
+            },
+            [getFieldValue, setFieldsValue, blogCreateForm],
+        );
+        const customRequest = useCallback(
+            (info: IObject) => {
+                const file = info.file;
+                api.upload([file], {
+                    onUploadProgress: (progressEvent: any) => {
+                        const percent =
+                            (progressEvent.loaded / progressEvent.total) | 0;
+                        info.onProgress({ percent: percent });
+                    },
+                })
+                    .then(urls => {
+                        info.onSuccess(urls);
+                    })
+                    .catch(info.onError)
+                    .finally(blogCreateForm.hideLoading.bind(blogCreateForm));
+            },
+            [blogCreateForm],
+        );
         const formProps: FormProps = {
             className: 'blog-create-form',
             layout: 'horizontal',
@@ -42,6 +87,35 @@ const BlogCreation = createLazyForm('blogCreateForm', API_PATH.blogs)(
                 span: 24,
             },
         };
+        const initEditorState = useMemo(() => {
+            BraftEditor.createEditorState(null);
+        }, []);
+        const extendControls: ExtendControlType[] = useMemo(() => {
+            return [
+                {
+                    key: 'antd-uploader',
+                    type: 'component',
+                    component: (
+                        <Upload
+                            accept='image/*'
+                            showUploadList={false}
+                            multiple
+                            customRequest={customRequest}
+                            onChange={handleChange}
+                            beforeUpload={beforeUpload}
+                        >
+                            <Button
+                                className='control-item button upload-button'
+                                data-title='insert pictures'
+                            >
+                                <Icon type='picture' theme='filled' />
+                            </Button>
+                        </Upload>
+                    ),
+                },
+            ];
+        }, [handleChange, customRequest]);
+
         return (
             <Form {...formProps}>
                 <Row>
@@ -98,6 +172,35 @@ const BlogCreation = createLazyForm('blogCreateForm', API_PATH.blogs)(
                                 autosize={{ minRows: 5, maxRows: 7 }}
                                 maxLength={200}
                                 placeholder='Description'
+                            />,
+                        )}
+                    </Item>
+                </Row>
+                <Row>
+                    <Item label={'Content'} wrapperCol={{ span: 24 }}>
+                        {getFieldDecorator('content', {
+                            validateTrigger: 'onBlur',
+                            initialValue: initEditorState,
+                            rules: [
+                                {
+                                    required: true,
+                                    validator: (_, value, callback) => {
+                                        if (value.isEmpty()) {
+                                            callback(
+                                                'Please input some content',
+                                            );
+                                        } else {
+                                            callback();
+                                        }
+                                    },
+                                },
+                            ],
+                        })(
+                            <BraftEditor
+                                language={'en'}
+                                className='immortal-editor'
+                                extendControls={extendControls}
+                                placeholder='Please input some content'
                             />,
                         )}
                     </Item>
